@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./style.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4 d-flex">
+            <div class="card ">
+                <div class="card-body ">
+                    <div class="row mb-4">
+                        <div class="col-4 text-center">
+                            <i class="bi bi-qr-code-scan icone-dashboard"></i>
+                            <form action="{{url_for('lerQRCODE')}}" method="get">
+                              <button>Pegar Chaves</button>
+                            </form>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-key-fill icone-dashboard"></i>
+                            <button class="btn btn-dark-blue btn-block">Acessar Chaves</button>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-people-fill icone-dashboard"></i>
+                            <button href="#" class="btn btn-dark-blue btn-block">Acessar Usuários</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <i class="bi bi-key icone-dashboard"></i>
+                            <buton class="btn btn-dark-blue btn-block">Nova Chave</buton>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-person-circle icone-dashboard"></i>
+                            <buton class="btn btn-dark-blue btn-block">Novo Usuário</buton>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-list-check icone-dashboard"></i>
+                            <button href="#" class="btn btn-dark-blue btn-block">Imprimir Relatório</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</body>
+</html>
