@@ -1,24 +1,20 @@
 import cv2
 import numpy as np
-from pyzbar.pyzbar import decode
-import keyboard
-
 from flask import Flask, render_template, request
-app=Flask(__name__,template_folder='Templates')
+app=Flask(__name__,template_folder='Templates',static_folder="static")
 
-from dotenv import load_dotenv
-load_dotenv()
-
+#import dotenv
+#load_dotenv()
 import os
-from supabase import create_client
-
-supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
-supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
-supabase = create_client(supabaseUrl, supabaseKey)
-
 #Metodo para validar login
 @app.route("/", methods = ["GET", "POST"])
 def login():
+    from supabase import create_client, Client
+
+    supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
+    supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
+    supabase = create_client(supabaseUrl, supabaseKey)
+
     if request.method == "GET":
         return render_template('login.html')
     emailp = request.form.get("email")
@@ -31,6 +27,8 @@ def login():
 
 @app.route("/home.html", methods = ["GET", "POST"])
 def lerQRCODE():
+    import keyboard
+    import pyzbar.pyzbar
     cap = cv2.VideoCapture(0)
     cap.set(3, 640)
     cap.set(4, 480)
