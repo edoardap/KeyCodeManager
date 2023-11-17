@@ -52,10 +52,21 @@ class SingletonSistema():
         pass
 
 class ChavePrototipo:
-    def __init__(self, id, nome, qr_code):
+    def __init__(self, id = 0, nome = '', qr_code = '', posse = 0):
         self._idChave = id
         self._nomeSala = nome
         self._qrCode = qr_code
+        self._posse = posse
+
+    def clonar(self, n):
+        copia = copy.copy(self)
+        return copia
+
+import copy
+
+class Chave(ChavePrototipo):
+    def __init__(self, id_chave, nome, qr_code, posse):
+        super().__init__(id_chave, nome, qr_code, posse)
 
     def setId(self, nome):
         self._idChave = nome
@@ -66,6 +77,9 @@ class ChavePrototipo:
     def setQrCode(self, cod):
         self._qrCode = cod
 
+    def setPosse(self, id):
+        self._posse = id
+
     def getId(self):
         return self._idChave
 
@@ -75,18 +89,8 @@ class ChavePrototipo:
     def getQrCode(self):
         return self._qrCode
 
-import copy
-
-class chavetemporaria(ChavePrototipo):
-    def __init__(self, id_chave, nome, qr_code):
-        super().__init__(id_chave, nome, qr_code)
-
-    def clonar(self, n):
-        copias_chaves = []
-        for i in range(n):
-            copia = copy.copy(self)
-            copias_chaves.append(copia)
-        return copias_chaves
+    def getPosse(self):
+        return self._posse
 
 from abc import ABC, abstractmethod
 class Usuario(ABC):
@@ -239,3 +243,11 @@ class Aluno(Usuario):
     def acessarChaves(self):
         for i in self._listChaves:
             pass
+
+    def setListChaves(self, lista):
+        self._listChaves = lista
+
+    def passarChaveAluno(self, chave, aluno):
+        pass
+    def passarChave(self, funcionario):
+        pass
