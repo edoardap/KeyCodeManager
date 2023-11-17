@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exibir Chaves</title>
+</head>
+<body>
+    <h1>Chaves</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Chave ID</th>
+                <th>Nome da Sala</th>
+                <th>qrCode</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chave in chave.data %}
+            <tr>
+                <td>{{ chave['id'] }}</td>
+                <td>{{ chave['nomeSala']}}</td>
+                <td>{{ chave['qrCode']}}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

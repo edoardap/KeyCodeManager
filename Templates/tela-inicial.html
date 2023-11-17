@@ -20,15 +20,19 @@
             </div>
             <div class="col-4 text-center">
               <i class="bi bi-key-fill icone-dashboard"></i>
+              <form action= "{{url_for('acessarChaves')}}" method = "get">
               <button class="btn btn-dark-blue btn-block">
                 Acessar Chaves
               </button>
+            </form>
             </div>
             <div class="col-4 text-center">
               <i class="bi bi-people-fill icone-dashboard"></i>
+              <form action= "{{url_for('acessarUsuarios')}}" method = "get">
               <button href="#" class="btn btn-dark-blue btn-block">
                 Acessar Usuários
               </button>
+            </form>
             </div>
           </div>
           <div class="row">

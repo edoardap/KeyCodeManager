@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Acesso a usuários</title>
+</head>
+<body>
+    <h1>Usuários</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuario.data %}
+            <tr>
+                <td>{{ usuario['id'] }}</td>
+                <td>{{ usuario['nome'] }}</td>
+                <td>{{ usuario['email'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
