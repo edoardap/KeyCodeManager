@@ -1,23 +1,45 @@
-import threading
-class SingletonSistema():
-    _instancia = None
-    _lock = threading.Lock()
 
+class TelaLogin():
+    def __init__(self, email, senha, nome=""):
+        self.email = email
+        self.senha = senha
+        self.nome = nome
+
+    def setEmail(self, email):
+        self.email = email
+
+    def setSenha(self, password):
+        self.senha = password
+
+    def setNome(self, nome):
+        self.nome = nome
+
+    def getEmail(self):
+        return self.email
+
+    def getSenha(self):
+        return self.senha
+
+    def getNome(self):
+        return self.nome
+
+class Gerenciador():
+    _instancia = None
     def __init__(self):
-        if SingletonSistema._instancia != None:
+        if Gerenciador._instancia != None:
             raise Exception("This class is a singleton class!")
         else:
             self._usuarios = []
             self._chaves = []
             self._gerenteChaves = ""
-            SingletonSistema._instancia = self
+            Gerenciador._instancia = self
 
     @staticmethod
     def getInstance():
-        with SingletonSistema._lock:
-            if SingletonSistema._instancia is None:
-                return SingletonSistema()
-            return SingletonSistema._instancia
+        with Gerenciador._lock:
+            if Gerenciador._instancia is None:
+                return Gerenciador()
+            return Gerenciador._instancia
 
     def adicionarUsuario(self, usuario):
         self._usuarios.append(usuario)
@@ -91,6 +113,7 @@ class Chave(ChavePrototipo):
 
     def getPosse(self):
         return self._posse
+
 
 from abc import ABC, abstractmethod
 class Usuario(ABC):
@@ -251,3 +274,5 @@ class Aluno(Usuario):
         pass
     def passarChave(self, funcionario):
         pass
+
+
