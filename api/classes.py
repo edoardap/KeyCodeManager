@@ -102,6 +102,12 @@ class Chave(ChavePrototipo):
     def setPosse(self, id):
         self._posse = id
 
+    def setQrCode(self, qrcode):
+        self._qrCode = qrcode
+
+    def setPosse(self, posse):
+        self._posse = posse
+
     def getId(self):
         return self._idChave
 
@@ -117,7 +123,8 @@ class Chave(ChavePrototipo):
 
 from abc import ABC, abstractmethod
 class Usuario(ABC):
-    def __init__(self, nome, senha, email):
+    def __init__(self, id, nome, senha, email):
+        self._id = id
         self._nome = nome
         self._email = email
         self._senha = senha
@@ -130,6 +137,12 @@ class Usuario(ABC):
 
     def setSenha(self, senha):
         self._senha = senha
+
+    def setId(self, id):
+        self._id = id
+
+    def getId(self):
+        return self._id
 
     def getNome(self):
         return self._nome
@@ -244,7 +257,7 @@ class geradorQRCode():
 
 class Aluno(Usuario):
     def __init__(self, nome, senha, email, matricula):
-        super().__init__(nome, senha, email)
+        super().__init__(nome, senha, email, matricula)
         self._matricula = matricula
         self._listChaves = []
 
