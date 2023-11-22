@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from pyzbar.pyzbar import decode
 import keyboard
+from classes import *
 
 from flask import Flask, render_template, request
 app=Flask(__name__,template_folder='Templates',static_folder="static")
@@ -17,14 +18,19 @@ supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
 supabase = create_client(supabaseUrl, supabaseKey)
 
 
+gerenciador = Gerenciador()
+gerente = Gerente("Jeremias", "12345", "@gmail.com")
+login = TelaLogin()
+
+
 #Metodo para validar login
 @app.route("/", methods = ["GET", "POST"])
 def login():
     if request.method == "GET":
         return render_template('login.html')
-    emailp = request.form.get("email")
-    senhap = request.form.get("senha")
-    amostra = supabase.table("usuarios").select('email', 'senha').eq("email", emailp).eq("senha", senhap).execute()
+    login.email = request.form.get("email")
+    login.senha = request.form.get("senha")
+    amostra = supabase.table("usuarios").select('email', 'senha').eq("email", login.email).eq("senha", login.senha).execute()
     #id_login = supabase.table("usuarios").select('id').eq("email", emailp).eq("senha", senhap).execute()
     if amostra.data != []:
         return render_template('tela-inicial.html')
@@ -55,13 +61,13 @@ def lerQRCODE():
             break  
 
 
+
 #Retorna apenas o básico
 @app.route("/acesso.html", methods = ["GET", "POST"])
 def acessarChaves():
-    if request.method == "GET":
-      chaves = supabase.table('chaves').select('id', 'nomeSala', 'qrCode').execute()
-      for chave in chaves.data:
-        return render_template('acessar-chaves.html', chave = chaves)
+   chaves = gerente.AcessarChavesCadastradas(gerenciador)
+   for chave in chaves.data:
+       return render_template('acessar-chaves.html', chave=chaves)
 
 
 #Retorna apenas o básico
@@ -72,3 +78,6 @@ def acessarUsuarios():
       usuarios = supabase.table('usuarios').select('id','nome','email').execute()
       for usuario in usuarios.data:
          return render_template('acessar-usuarios.html', usuario = usuarios)
+
+if __name__ == "__main__":
+    app.run(debug=True)
