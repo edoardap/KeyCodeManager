@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from pyzbar.pyzbar import decode
 import keyboard
-from classes import *
+from classesV2 import *
 
 from flask import Flask, render_template, request
 app=Flask(__name__,template_folder='Templates',static_folder="static")
