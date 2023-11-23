@@ -1,11 +1,6 @@
-from supabase import create_client
-from flask import render_template, request
-supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
-supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
-supabase = create_client(supabaseUrl, supabaseKey)
 
 class TelaLogin():
-    def __init__(self, email="", senha="", nome=""):
+    def __init__(self, email, senha, nome=""):
         self.email = email
         self.senha = senha
         self.nome = nome
@@ -34,6 +29,8 @@ class Gerenciador():
         if Gerenciador._instancia != None:
             raise Exception("This class is a singleton class!")
         else:
+            self._usuarios = []
+            self._chaves = []
             self._gerenteChaves = ""
             Gerenciador._instancia = self
 
@@ -63,11 +60,6 @@ class Gerenciador():
 
     def alterarChave(self):
         pass
-
-    def acessarChaves(self):
-        if request.method == "GET":
-            return supabase.table('chaves').select('id', 'nomeSala', 'qrCode').execute()
-
 
     def setGerente(self, gerente):
         self._gerenteChaves = gerente
@@ -110,6 +102,12 @@ class Chave(ChavePrototipo):
     def setPosse(self, id):
         self._posse = id
 
+    def setQrCode(self, qrcode):
+        self._qrCode = qrcode
+
+    def setPosse(self, posse):
+        self._posse = posse
+
     def getId(self):
         return self._idChave
 
@@ -125,7 +123,8 @@ class Chave(ChavePrototipo):
 
 from abc import ABC, abstractmethod
 class Usuario(ABC):
-    def __init__(self, nome, senha, email):
+    def __init__(self, id, nome, senha, email):
+        self._id = id
         self._nome = nome
         self._email = email
         self._senha = senha
@@ -138,6 +137,12 @@ class Usuario(ABC):
 
     def setSenha(self, senha):
         self._senha = senha
+
+    def setId(self, id):
+        self._id = id
+
+    def getId(self):
+        return self._id
 
     def getNome(self):
         return self._nome
@@ -199,15 +204,16 @@ class Professor(Funcionario):
 
 
 class Gerente(Funcionario):
-    def __init__(self, nome="", senha="", email="", contrato="", id=""):
+    def __init__(self, nome, senha, email, contrato, id, gerador_qr):
         super().__init__(nome, senha, email, contrato)
         self._id = id
+        self._geradorQr = gerador_qr
 
     def setId(self, num):
         self._id = num
 
-    def gerarQrCode(self, gerador):
-        pass
+    def setGeradorQrCode(self, gerador):
+        self._geradorQr = gerador
 
     def cadastrarChave(self, id, nome, cod_qr):
         # adicionar na tabela chaves e na instancia de Sistema
@@ -221,9 +227,6 @@ class Gerente(Funcionario):
     def removerChave(self, chave):
         # delete na ocorrencia da tabela chaves e na instancia de sistema
         pass
-
-    def AcessarChavesCadastradas(self, gerenciador):
-        return gerenciador.acessarChaves()
 
     def adicionarUsuario(self, usuario):
         # adcionar na tabela usuarios e na instancia de sistema
@@ -254,7 +257,7 @@ class geradorQRCode():
 
 class Aluno(Usuario):
     def __init__(self, nome, senha, email, matricula):
-        super().__init__(nome, senha, email)
+        super().__init__(nome, senha, email, matricula)
         self._matricula = matricula
         self._listChaves = []
 
