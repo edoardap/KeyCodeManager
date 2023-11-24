@@ -4,11 +4,11 @@ from pyzbar.pyzbar import decode
 import keyboard
 from classesV2 import *
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 app=Flask(__name__,template_folder='Templates',static_folder="static")
 
-#from dotenv import load_dotenv
-#load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 import os
 from supabase import create_client
@@ -38,33 +38,27 @@ def login():
         return '<h1> email ou senha incorretos </h1>'
 
 @app.route("/home.html", methods = ["GET", "POST"])
-def lerQRCODE(mirror=False):
-    cam = cv2.VideoCapture(0)
-    cam.set(3, 640)
-    cam.set(4, 480)
-    myData = None
+def lerQRCODE():
+    cap = cv2.VideoCapture(0)
+    cap.set(3, 640)
+    cap.set(4, 480)
     while True:
-        ret_val, img = cam.read()
-        if mirror:
-            img = cv2.flip(img, 1)
-        cv2.imshow('Leitor', img)
+        success, img = cap.read()
         for barcode in decode(img):
             # print(barcode.data)
             myData = barcode.data.decode('utf-8')
             print(myData, flush=True)
             pts = np.array([barcode.polygon], np.int32)
             pts = pts.reshape((-1, 1, 2))
-            cv2.polylines(img, [pts], True, (255, 0, 255), 5)
+            cv2.polylines(img, [pts], True, (255,0,255), 5)
             pts2 = barcode.rect
-            cv2.putText(img, myData, (pts2[0], pts2[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 165, 0), 2)
-            if myData:
-                break
-
-        if cv2.waitKey(1) == 27 or myData:
-            break
-    cv2.destroyAllWindows()
-    return "QRCode lido"
-
+            cv2.putText(img, myData, (pts2[0], pts2[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 165,0), 2)   
+        cv2.imshow('Scan QR Code - https://laptrinhvb.net', img)
+        cv2.waitKey(1)
+        codigo_acesso = myData
+        if keyboard.is_pressed('q'): 
+            return codigo_acesso
+            break  
 
 
 
@@ -84,6 +78,60 @@ def acessarUsuarios():
       usuarios = supabase.table('usuarios').select('id','nome','email').execute()
       for usuario in usuarios.data:
          return render_template('acessar-usuarios.html', usuario = usuarios)
+
+@app.route('/chave.html')
+def novaChave():
+    return render_template('nova-chave.html')
+
+@app.route('/adicionarChave', methods=['POST'])
+def adicionarChave():
+    # Obtenha os dados do formulário
+    nome_sala = request.form['nomeSala']
+    qr_code = request.form['qrCode']
+
+    # Nome da tabela no Supabase
+    tabela = 'chaves'
+
+    # Verificar se o registro já existe (assumindo que 'ID' é uma chave única)
+    registro_existente = supabase.table(tabela).select('nomeSala').eq('nomeSala', nome_sala).execute()
+
+
+    if registro_existente.data !=[]:
+        # Se o registro existir, você pode optar por atualizá-lo usando o método update
+        supabase.table(tabela).update([{'nomeSala': nome_sala, 'qrCode': qr_code}]).eq('nomeSala', nome_sala).execute()
+    else:
+        resultados = supabase.table(tabela).select('id').order('id', desc=True).limit(1).single().execute()
+        last_ID = resultados.data['id']+1
+        # Se o registro não existir, insira um novo registro usando o método insert
+        dados_para_adicionar = [{'id': last_ID, 'nomeSala': nome_sala, 'qrCode': qr_code}]
+        resposta = supabase.table(tabela).insert(dados_para_adicionar).execute()
+    return redirect('/chave.html')
+
+@app.route('/addUsuario', methods=['POST'])
+def adicionarUsuario():
+    # Obtenha os dados do formulário
+    email = request.form['logemail_c']
+    nome = request.form['logname']
+    senha = request.form['logpass']
+
+    # Nome da tabela no Supabase
+    tabela = 'usuarios'
+
+    # Verificar se o registro já existe (assumindo que 'ID' é uma chave única)
+    registro_existente = supabase.table(tabela).select('email').eq('email', email).execute()
+
+
+    if registro_existente.data !=[]:
+        # Se o registro existir, você pode optar por atualizá-lo usando o método update
+        supabase.table(tabela).update([{'nome': nome, 'email': email, 'senha' :senha}]).eq('email', email).execute()
+    else:
+        resultados = supabase.table(tabela).select('id').order('id', desc=True).limit(1).single().execute()
+        last_ID = resultados.data['id']+1
+        # Se o registro não existir, insira um novo registro usando o método insert
+        dados_para_adicionar = [{'id': last_ID, 'nome': nome, 'email': email,'senha':senha}]
+        resposta = supabase.table(tabela).insert(dados_para_adicionar).execute()
+    return redirect('/')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
