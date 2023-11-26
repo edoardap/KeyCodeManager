@@ -3,27 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <title>Exibir Chaves</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        table {
+            margin: 0 auto;
+            width: 50%;
+            border-collapse: collapse;
+            border-color: #ccc;
+            background-color: #ffffff;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        th {
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
-    <h1>Chaves</h1>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Chave ID</th>
-                <th>Nome da Sala</th>
-                <th>qrCode</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for chave in chave.data %}
-            <tr>
-                <td>{{ chave['id'] }}</td>
-                <td>{{ chave['nomeSala']}}</td>
-                <td>{{ chave['qrCode']}}</td>
+<h1>Chaves</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Chave ID</th>
+        <th>Nome da Sala</th>
+        <th>qrCode</th>
+        <th>Em posse de: </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for chave in chave.data %}
+    <tr>
+        <td>{{ chave['id'] }}</td>
+        <td>{{ chave['nomeSala']}}</td>
+        <td>{{ chave['qrCode']}}</td>
+        <td>{{ chave['posse']}}</td>
 
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 </body>
 </html>

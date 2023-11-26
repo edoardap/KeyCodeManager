@@ -85,7 +85,7 @@ class Gerenciador():
 
     def acessarChaves(self):
         if request.method == "GET":
-            return supabase.table('chaves').select('id', 'nomeSala', 'qrCode').execute()
+            return supabase.table('chaves').select('id', 'nomeSala', 'qrCode', 'posse').execute()
 
 
     def setGerente(self, gerente):
