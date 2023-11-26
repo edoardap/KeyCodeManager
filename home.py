@@ -70,9 +70,9 @@ def lerQRCODE(mirror=False):
     chave = Chave(myData, "", "", "")
     resposta = funcionario.pegarChave(chave, login.id)
     if resposta == 2:
-        return "Chave não cadastrada"
+        return '<h1>Chave não cadastrada</h1>'
     else:
-        return "Você pegou a chave {}!".format(chave.getNomeSala())
+        return '<h1>Você pegou a chave {}!</h1>'.format(chave.getNomeSala())
 
 #Retorna apenas o básico
 @app.route("/acesso.html", methods = ["GET", "POST"])
