@@ -9,6 +9,7 @@ class TelaLogin():
         self.email = email
         self.senha = senha
         self.nome = nome
+        self.id = ""
 
     def setEmail(self, email):
         self.email = email
@@ -19,6 +20,9 @@ class TelaLogin():
     def setNome(self, nome):
         self.nome = nome
 
+    def setId(self, id):
+        self.id = id
+
     def getEmail(self):
         return self.email
 
@@ -27,6 +31,9 @@ class TelaLogin():
 
     def getNome(self):
         return self.nome
+
+    def getId(self):
+        return self.id
 
 class Gerenciador():
     _instancia = None
@@ -49,20 +56,32 @@ class Gerenciador():
         #chamada ao banco
 
     def removerUsuario(self, usuario):
-        self._usuarios.remove(usuario)
+        pass
         #chamada ao banco
 
     def alterarUsuario(self, usuario):
         pass
 
     def cadastrarChave(self, chave):
-        self._chaves.append(chave)
+        pass
 
     def removerChave(self, chave):
-        self._chaves.remove(chave)
+        pass
 
     def alterarChave(self):
         pass
+
+    def pegarChave(self, chave, id_user):
+        table = supabase.table("chaves").select('id', 'nomeSala', 'qrCode', 'posse').eq("id", chave.getId()).execute()
+        print(table.data)
+        if table.data != []:
+            chave.setNomeSala(table.data[0]['nomeSala'])
+            chave.setQrCode(table.data[0]['qrCode'])
+            chave.setPosse(table.data[0]['posse'])
+            supabase.table('chaves').update([{'posse': id_user}]).eq('id', chave.getId()).execute()
+            return chave
+        else:
+            return 2
 
     def acessarChaves(self):
         if request.method == "GET":
@@ -82,7 +101,7 @@ class Gerenciador():
         pass
 
 class ChavePrototipo:
-    def __init__(self, id = 0, nome = '', qr_code = '', posse = 0):
+    def __init__(self, id = "", nome = '', qr_code = '', posse = 0):
         self._idChave = id
         self._nomeSala = nome
         self._qrCode = qr_code
@@ -148,9 +167,14 @@ class Usuario(ABC):
     def getSenha(self):
         return self._senha
 
+
     @abstractmethod
-    def passarChaveAluno(self, chave, aluno):
+    def pegarChave(self, chave):
         pass
+
+    #@abstractmethod
+    #def passarChaveAluno(self, chave, aluno):
+        #pass
 
     @abstractmethod
     def passarChave(self, funcionario):
@@ -167,6 +191,18 @@ class Funcionario(Usuario): #falta implementar
 
     def getContrato(self):
         return self._contrato
+
+    def pegarChave(self, chave, id_user):
+        table = supabase.table("chaves").select('id', 'nomeSala', 'qrCode', 'posse').eq("id", chave.getId()).execute()
+        print(table.data)
+        if table.data != []:
+            chave.setNomeSala(table.data[0]['nomeSala'])
+            chave.setQrCode(table.data[0]['qrCode'])
+            chave.setPosse(table.data[0]['posse'])
+            supabase.table('chaves').update([{'posse': id_user}]).eq('id', chave.getId()).execute()
+            return chave
+        else:
+            return 2
 
     def passarChave(self, funcionario):
         pass
