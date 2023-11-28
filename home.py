@@ -37,9 +37,17 @@ def login():
         login.id = resp.data[0].get('id')
         print(login.id)
     if amostra.data != []:
-        return render_template('tela-inicial.html')
+        if login.email == 'gerente@ifpb.edu.br':
+            return render_template('tela-inicial.html')
+        if login.email.endswith('@ifpb.edu.br'):
+            return render_template('tela-inicial2.html')
+        elif  login.email.endswith('@academico.ifpb.edu.br'):
+            return render_template('tela-inicial3.html')
+        else:
+            '<h1> email ou senha incorretos </h1>'
     else:
         return '<h1> email ou senha incorretos </h1>'
+
 
 @app.route("/home.html", methods = ["GET", "POST"])
 def lerQRCODE(mirror=False):
