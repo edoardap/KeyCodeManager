@@ -142,7 +142,7 @@ def adicionarUsuario():
 
 
     if registro_existente.data !=[]:
-        # Se o registro existir, você pode optar por atualizá-lo usando o método update
+        # Se o registro existir, você pode optar por atualizá-lo usando o métod{{url_for('novaChave')}}o update
         supabase.table(tabela).update([{'nome': nome, 'email': email, 'senha' :senha}]).eq('email', email).execute()
     else:
         resultados = supabase.table(tabela).select('id').order('id', desc=True).limit(1).single().execute()
@@ -151,6 +151,16 @@ def adicionarUsuario():
         dados_para_adicionar = [{'id': last_ID, 'nome': nome, 'email': email,'senha':senha}]
         resposta = supabase.table(tabela).insert(dados_para_adicionar).execute()
     return redirect('/')
+
+@app.route("/acessarHistorico", methods=['POST'])
+def acessarHistorico():
+    #query = """SELECT historico.hora,chaves.nomeChave,usuarios.nomeUsuario FROM historico JOIN chaves ON historico.idChave = chaves.id JOIN usuarios ON historico.idUsuario = usuarios.id;"""
+    #controle = supabase.query(query)
+    if request.method == 'GET':
+        usuarios = supabase.table('historico').select('id', 'hora', 'id_chave', 'id_usuario').execute()
+        for usuario in usuarios.data:
+            return render_template('acessar-historico.html', usuario=usuarios)
+
 
 
 if __name__ == "__main__":

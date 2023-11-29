@@ -28,7 +28,7 @@
                     <a class="nav-link" href="#">Novo Usuário</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Imprimir Relatório</a>
+                    <a class="nav-link" href="{{url_for('acessarHistorico')}}">Acessar Histórico</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{url_for('login')}}">Sair</a>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="col-4 text-center">
                         <i class="bi bi-list-check icone-dashboard"></i>
-                        <a href="#" class="btn btn-dark-blue btn-block">Imprimir Relatório</a>
+                        <a href="{{url_for('acessarHistorico')}}" class="btn btn-dark-blue btn-block">Acessar Histórico</a>
                     </div>
                 </div>
             </div>
