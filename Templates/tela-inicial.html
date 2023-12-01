@@ -2,7 +2,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="./static/style.css">
+    <link rel="stylesheet" href="./static/StyleTelaInicial.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg" style="background-color: #102770;">
@@ -12,19 +12,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
+                <li class="nav-item active nav-espac">
                     <a class="nav-link" href="{{url_for('lerQRCODE')}}">Pegar Chaves <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item nav-espac">
                     <a class="nav-link" href="{{url_for('acessarChaves')}}">Acessar Chaves</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item nav-espac">
                     <a class="nav-link" href="{{url_for('acessarUsuarios')}}">Acessar Usuários</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item nav-espac">
                     <a class="nav-link" href="{{url_for('novaChave')}}">Nova Chave</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item nav-espac">
                     <a class="nav-link" href="#">Novo Usuário</a>
                 </li>
                 <li class="nav-item">
@@ -36,40 +36,37 @@
             </ul>
         </div>
     </nav>
-
-    <div class="container mt-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-4 text-center">
-                        <i class="bi bi-qr-code-scan icone-dashboard"></i>
-                        <a href="{{url_for('lerQRCODE')}}" class="btn btn-dark-blue btn-block">Pegar Chaves</a>
+<div class="body2">
+<div class ="buttons-container ">
+                    <div class="row mb-4">
+                        <div class="col-4 text-center">
+                            <i class="bi bi-qr-code-scan icone-dashboard"></i>
+                            <a href="{{url_for('lerQRCODE')}}" class="btn btn-dark-blue btn-block">Pegar Chaves</a>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-key-fill icone-dashboard"></i>
+                            <a href="{{url_for('acessarChaves')}}" class="btn btn-dark-blue btn-block">Acessar Chaves</a>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-people-fill icone-dashboard"></i>
+                            <a href="{{url_for('acessarUsuarios')}}" class="btn btn-dark-blue btn-block">Acessar Usuários</a>
+                        </div>
                     </div>
-                    <div class="col-4 text-center">
-                        <i class="bi bi-key-fill icone-dashboard"></i>
-                        <a href="{{url_for('acessarChaves')}}" class="btn btn-dark-blue btn-block">Acessar Chaves</a>
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <i class="bi bi-key icone-dashboard"></i>
+                            <a href="{{url_for('novaChave')}}" class="btn btn-dark-blue btn-block">Nova Chave</a>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-person-circle icone-dashboard"></i>
+                            <a href="#" class="btn btn-dark-blue btn-block">Novo Usuário</a>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="bi bi-list-check icone-dashboard"></i>
+                            <a href="{{url_for('acessarHistorico')}}" class="btn btn-dark-blue btn-block">Acessar Histórico</a>
+                        </div>
                     </div>
-                    <div class="col-4 text-center">
-                        <i class="bi bi-people-fill icone-dashboard"></i>
-                        <a href="{{url_for('acessarUsuarios')}}" class="btn btn-dark-blue btn-block">Acessar Usuários</a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4 text-center">
-                        <i class="bi bi-key icone-dashboard"></i>
-                        <a href="{{url_for('novaChave')}}" class="btn btn-dark-blue btn-block">Nova Chave</a>
-                    </div>
-                    <div class="col-4 text-center">
-                        <i class="bi bi-person-circle icone-dashboard"></i>
-                        <a href="#" class="btn btn-dark-blue btn-block">Novo Usuário</a>
-                    </div>
-                    <div class="col-4 text-center">
-                        <i class="bi bi-list-check icone-dashboard"></i>
-                        <a href="{{url_for('acessarHistorico')}}" class="btn btn-dark-blue btn-block">Acessar Histórico</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
+</div>
 </body>
 </html>

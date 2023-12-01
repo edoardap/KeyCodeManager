@@ -5,7 +5,7 @@
     <title>Exibir Chaves</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Courier;
             margin: 0;
             padding: 0;
         }
@@ -14,56 +14,60 @@
             text-align: center;
             margin-top: 40px;
             margin-bottom: 30px;
-            font-size: 20px;
+            font-size: 30px;
             font-weight: bold;
             color: #000000;
         }
 
         table {
-            margin: 0 auto;
-            width: 50%;
-            border-collapse: collapse;
-            border-color: #ccc;
-            background-color: #ffffff;
+            width: 40%;
+            border-color: white;
+            text-align: center;
+            margin: 40px auto;
+            font-size: 1.05em;
+            padding: 30px 30px 30px 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 50px rgba(10, 88, 202, 0.5);
         }
-
         th,
         td {
-            border: 1px solid #ccc;
             padding: 10px;
         }
-
         th {
             text-align: center;
-        }
+            background-color: #0A58CAFF;
+            color: white;
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        }
+        h1{
+            color: #0A58CAFF;
         }
     </style>
 </head>
 <body>
 <h1>Chaves</h1>
-<table border="1">
-    <thead>
-    <tr>
-        <th>Chave ID</th>
-        <th>Nome da Sala</th>
-        <th>qrCode</th>
-        <th>Em posse de: </th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for chave in chave.data %}
-    <tr>
-        <td>{{ chave['id'] }}</td>
-        <td>{{ chave['nomeSala']}}</td>
-        <td>{{ chave['qrCode']}}</td>
-        <td>{{ chave['posse']}}</td>
+<div class = "container">
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Identificador</th>
+            <th>Nome da Sala</th>
+            <th>QrCode</th>
+            <th>Em posse de: </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for chave in chave.data %}
+        <tr>
+            <td>{{ chave['id'] }}</td>
+            <td>{{ chave['nomeSala']}}</td>
+            <td>{{ chave['qrCode']}}</td>
+            <td>{{ chave['posse']}}</td>
 
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 </body>
 </html>
