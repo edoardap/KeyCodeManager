@@ -152,16 +152,22 @@ def adicionarUsuario():
         resposta = supabase.table(tabela).insert(dados_para_adicionar).execute()
     return redirect('/')
 
-@app.route("/acessarHistorico", methods=['POST'])
+@app.route("/acessarHistorico", methods = ["GET", "POST"])
 def acessarHistorico():
     #query = """SELECT historico.hora,chaves.nomeChave,usuarios.nomeUsuario FROM historico JOIN chaves ON historico.idChave = chaves.id JOIN usuarios ON historico.idUsuario = usuarios.id;"""
     #controle = supabase.query(query)
     if request.method == 'GET':
-        usuarios = supabase.table('historico').select('id', 'hora', 'id_chave', 'id_usuario').execute()
-        for usuario in usuarios.data:
-            return render_template('acessar-historico.html', usuario=usuarios)
+        historicos = supabase.table('historico').select('id', 'hora', 'id_chave', 'id_usuario').execute()
+#         id = historicos.data[0].get('id_chave')
+#         retornarChavePeloID(id)
 
+        for historico in historicos.data:
+            return render_template('acessar-historico.html', historico=historicos)
 
+def retornarChavePeloID(id):
+      chave = supabase.table('chaves').select('nomeSala').eq("id", id).execute()
+      nomeSala = chave.data[0].get('nomeSala')
+      return nomeSala
 
 if __name__ == "__main__":
     app.run(debug=True)

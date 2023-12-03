@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Exibir Chaves</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
             font-family: Courier;
@@ -42,6 +43,11 @@
         h1{
             color: #0A58CAFF;
         }
+        button{
+            border: none;
+            background-color: white;
+            font-size: 1.2rem
+        }
     </style>
 </head>
 <body>
@@ -54,6 +60,7 @@
             <th>Nome da Sala</th>
             <th>QrCode</th>
             <th>Em posse de: </th>
+            <th>Imprimir QrCode</th>
         </tr>
         </thead>
         <tbody>
@@ -63,6 +70,11 @@
             <td>{{ chave['nomeSala']}}</td>
             <td>{{ chave['qrCode']}}</td>
             <td>{{ chave['posse']}}</td>
+            <td>
+                <button type="button">
+                    <i class="bi bi-arrow-down-square-fill"></i>
+                </button>
+            </td>
 
         </tr>
         {% endfor %}
