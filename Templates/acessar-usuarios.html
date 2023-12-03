@@ -68,14 +68,16 @@
                 <td>{{ usuario['nome'] }}</td>
                 <td>{{ usuario['email'] }}</td>
                 <td>
-                    <button type="button">
-                        <span id="boot-icon" class="bi bi-trash"></span>
-                    </button>
+                    <form method="POST" action="/deleteUsuario/{{ usuario['id'] }}">
+                        <button type="submit" name="deleteUsuario">
+                            <span id="boot-icon" class="bi bi-trash"></span>
+                        </button>
+                    </form>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-default btn-lg">
-                        <i class="bi bi-pencil-fill"></i>
-                    </button>
+                   <button type="button" name = "updateUsuario" class="btn btn-default btn-lg">
+                       <i class="bi bi-pencil-fill"></i>
+                   </button>
                 </td>
             </tr>
             {% endfor %}

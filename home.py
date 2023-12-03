@@ -4,7 +4,7 @@ from pyzbar.pyzbar import decode
 import keyboard
 from classesV2 import *
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_file
 app=Flask(__name__,template_folder='Templates',static_folder="static")
 
 from dotenv import load_dotenv
@@ -87,17 +87,32 @@ def lerQRCODE(mirror=False):
 def acessarChaves():
    chaves = gerente.AcessarChavesCadastradas(gerenciador)
    for chave in chaves.data:
-       return render_template('acessar-chaves.html', chave=chaves)
+       return render_template('acessar-chaves.html', chaves=chaves, retornarNomePeloID=retornarNomePeloID)
 
+def retornarNomePeloID(id):
+    user_name = supabase.table("usuarios").select('nome').eq("id", id).execute()
+    name = user_name.data[0].get('nome')
+    print(name)
+    return name
 
-#Retorna apenas o básico
+@app.route("/gerar_qrcode/<cod>/<name>", methods=["GET", "POST"])
+def gerar_qrcode(cod, name):
+    gerador = geradorQRCode()
+    img_path = gerador.gerarQRCode(cod, name)
+    return send_file(img_path, as_attachment=True)
+
 @app.route("/usuarios.html", methods = ["GET", "POST"])
 def acessarUsuarios():
-    ##Aqui deve ser mostrado as chaves que cada usuário tem acesso?##
     if request.method == "GET":
       usuarios = supabase.table('usuarios').select('id','nome','email').execute()
       for usuario in usuarios.data:
          return render_template('acessar-usuarios.html', usuario = usuarios)
+
+@app.route("/deleteUsuario/<id>", methods=["GET", "POST"])
+def deleteUsuario(id):
+    adapter = adapterBD()
+    adapter.deleteUsuario(id)
+    return '<h1> Usuário removido com sucesso </h1>'
 
 @app.route('/chave.html')
 def novaChave():

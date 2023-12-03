@@ -64,18 +64,26 @@
         </tr>
         </thead>
         <tbody>
-        {% for chave in chave.data %}
+        {% for chave in chaves.data %}
         <tr>
             <td>{{ chave['id'] }}</td>
             <td>{{ chave['nomeSala']}}</td>
             <td>{{ chave['qrCode']}}</td>
-            <td>{{ chave['posse']}}</td>
             <td>
-                <button type="button">
-                    <i class="bi bi-arrow-down-square-fill"></i>
-                </button>
+                {% if chave['posse'] is not none %}
+                    {% set user_id = chave['posse'] %}
+                    {% set user_name = retornarNomePeloID(user_id) %}
+                    {{ user_name }}
+                {% else %}
+                    Sem usuário
+                {% endif %}
+            <td>
+                <form method="POST" action="/gerar_qrcode/{{ chave['qrCode']}}/{{ chave['nomeSala'] }}">
+                    <button type="submit" name="gerar_qrcode">
+                        <i class="bi bi-arrow-down-square-fill"></i>
+                    </button>
+                </form>
             </td>
-
         </tr>
         {% endfor %}
         </tbody>
