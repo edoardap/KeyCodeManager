@@ -17,8 +17,8 @@ supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
 supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
 supabase = create_client(supabaseUrl, supabaseKey)
 
-
-gerenciador = Gerenciador()
+adaptador_bd = adapterBD()
+gerenciador = Gerenciador(adaptador_bd)
 gerente = Gerente("Jeremias", "12345", "@gmail.com")
 login = TelaLogin()
 funcionario = Funcionario("", "", "", "" )
@@ -75,6 +75,7 @@ def lerQRCODE(mirror=False):
         if cv2.waitKey(1) == 27 or myData:
             break
     cv2.destroyAllWindows()
+    cam.release()
     chave = Chave(myData, "", "", "")
     resposta = funcionario.pegarChave(chave, login.id)
     if resposta == 2:

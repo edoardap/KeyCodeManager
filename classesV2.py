@@ -1,11 +1,16 @@
 from supabase import create_client
+from abc import ABC, abstractmethod
+import os
 
+#####################################
+#pode tirar esse trecho?
 supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
 supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
 supabase = create_client(supabaseUrl, supabaseKey)
 from flask import Flask, render_template, request, redirect
 app=Flask(__name__,template_folder='Templates',static_folder="static")
-import os
+######################################
+
 class TelaLogin():
     def __init__(self, email="", senha="", nome=""):
         self.email = email
@@ -37,14 +42,27 @@ class TelaLogin():
     def getId(self):
         return self.id
 
+
+class Proxy():
+    def __init__(self, token):
+        self.token = token
+
+    def conferirAcesso(self):
+        pass
+
+    def operacao(self):
+        pass
+
+
 class Gerenciador():
     _instancia = None
-    def __init__(self):
+    def __init__(self, adaptador):
         if Gerenciador._instancia != None:
             raise Exception("This class is a singleton class!")
         else:
             self._gerenteChaves = ""
             Gerenciador._instancia = self
+            self.adaptador = adaptador
 
     @staticmethod
     def getInstance():
@@ -54,24 +72,22 @@ class Gerenciador():
             return Gerenciador._instancia
 
     def adicionarUsuario(self, usuario):
-        self._usuarios.append(usuario)
-        #chamada ao banco
+        self.adaptador.writeUsuario(usuario)
 
-    def removerUsuario(self, usuario):
-        pass
-        #chamada ao banco
+    def removerUsuario(self, id):
+        self.adaptador.deleteUsuario(id)
 
     def alterarUsuario(self, usuario):
-        pass
+        self.adaptador.updateUsuario(usuario)
 
     def cadastrarChave(self, chave):
-        pass
+        self.adaptador.writeChave(chave)
 
     def removerChave(self, chave):
-        pass
+        self.adaptador.deleteChave(chave)
 
-    def alterarChave(self):
-        pass
+    def alterarChave(self, chave):
+        self.adaptador.updateChave(chave)
 
     def pegarChave(self, chave, id_user):
         table = supabase.table("chaves").select('id', 'nomeSala', 'qrCode', 'posse').eq("id", chave.getId()).execute()
@@ -91,16 +107,16 @@ class Gerenciador():
 
 
     def setGerente(self, gerente):
-        self._gerenteChaves = gerente
+        self.adaptador.writeGerente(gerente)
 
     def getGerente(self):
         return self._gerenteChaves
 
-    def removerGerente(self):
-        self._gerenteChaves = ""
+    def removerGerente(self, gerente):
+        self.adaptador.deleteGerente(gerente)
 
     def modificargerente(self, gerente):
-        pass
+        self.adaptador.updateGerente()
 
 class ChavePrototipo:
     def __init__(self, id = "", nome = '', qr_code = '', posse = 0):
@@ -112,6 +128,18 @@ class ChavePrototipo:
     def clonar(self, n):
         copia = copy.copy(self)
         return copia
+
+
+class Observer(ABC):
+    @abstractmethod
+    def adaptar(self):
+        pass
+
+class ObserverChave(Observer):
+    def adaptar(self):
+        "implementacao"
+        pass
+
 
 import copy
 
@@ -144,7 +172,6 @@ class Chave(ChavePrototipo):
         return self._posse
 
 
-from abc import ABC, abstractmethod
 class Usuario(ABC):
     def __init__(self, nome, senha, email):
         self._nome = nome
@@ -174,17 +201,13 @@ class Usuario(ABC):
     def pegarChave(self, chave):
         pass
 
-    #@abstractmethod
-    #def passarChaveAluno(self, chave, aluno):
-        #pass
-
     @abstractmethod
     def passarChave(self, funcionario):
         pass
 
 
-class Funcionario(Usuario): #falta implementar
-    def __init__(self, nome, senha, email, contrato):
+class Funcionario(Usuario):
+    def __init__(self, nome, senha, email, contrato=""):
         super().__init__(nome, senha, email)
         self._contrato = contrato
 
@@ -247,33 +270,29 @@ class Gerente(Funcionario):
     def gerarQrCode(self, gerador):
         pass
 
-    def cadastrarChave(self, id, nome, cod_qr):
-        # adicionar na tabela chaves e na instancia de Sistema
-        pass
+    def cadastrarChave(self, chave, gerenciador):
+        gerenciador.cadastrarChave(chave)
 
-    def modificarChave(self, chave):
-        # modificar na tabela chaves e na instancia de sistema
+    def modificarChave(self, chave, gerenciador):
+        gerenciador.alterarChave(chave)
 
-        pass
 
-    def removerChave(self, chave):
-        # delete na ocorrencia da tabela chaves e na instancia de sistema
+    def removerChave(self, chave, gerenciador):
+        gerenciador.removerChave(chave)
         pass
 
     def AcessarChavesCadastradas(self, gerenciador):
         return gerenciador.acessarChaves()
 
-    def adicionarUsuario(self, usuario):
-        # adcionar na tabela usuarios e na instancia de sistema
-        pass
+    def adicionarUsuario(self, usuario, gerenciador):
+        gerenciador.adicionarUsuario(usuario)
 
-    def modificarUsuario(self, usuario):
-        # modificar a tabela usuarios e o objeto usuario
-        pass
+    def modificarUsuario(self, usuario, gerenciador):
+        gerenciador.alterarUsuario(usuario)
 
-    def removerUsuario(self, usuario):
-        # delete em ocorrencia na tabela usuarios
-        pass
+    def removerUsuario(self, usuario, gerenciador):
+        gerenciador.removerUsuario(usuario)
+
 
 import qrcode
 @app.route("/gerarQRCode/<cod>/<name>", methods = ["GET", "POST"])
@@ -314,7 +333,7 @@ class Aluno(Usuario):
         return self._matricula
 
     def adicionarChave(self, chave):
-        self._listChaves.append(chave)
+        pass
 
     def retornarChave(self, id_chave):
         pass
