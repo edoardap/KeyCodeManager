@@ -24,29 +24,48 @@ login = TelaLogin()
 funcionario = Funcionario("", "", "", "" )
 
 
-#Metodo para validar login
-@app.route("/", methods = ["GET", "POST"])
+class AutenticadorReal:
+    def validar_login(self, email, senha):
+        # Aqui estaria a lógica de validação do login com o supabase
+        # Por questões de simplicidade, vou simular uma validação
+        amostra = supabase.table("usuarios").select('email', 'senha').eq("email", login.email).eq("senha", login.senha).execute()
+        resp = supabase.table("usuarios").select('id').eq("email", login.email).eq("senha", login.senha).execute()
+        if resp.data:
+           login.id = resp.data[0].get('id')
+        if(amostra.data != []):
+           return True
+
+class ProxyAutenticacao:
+    def __init__(self):
+        self.autenticador_real = AutenticadorReal()
+
+    def validar_login(self, email, senha):
+        # Adicionar lógica adicional de controle de acesso se necessário
+        return self.autenticador_real.validar_login(email, senha)
+
+proxy_autenticacao = ProxyAutenticacao()
+
+@app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
         return render_template('login.html')
+
     login.email = request.form.get("email")
     login.senha = request.form.get("senha")
-    amostra = supabase.table("usuarios").select('email', 'senha').eq("email", login.email).eq("senha", login.senha).execute()
-    resp = supabase.table("usuarios").select('id').eq("email", login.email).eq("senha", login.senha).execute()
-    if resp.data:
-        login.id = resp.data[0].get('id')
-        print(login.id)
-    if amostra.data != []:
+
+    # Utilizando o proxy para validar o login
+    if proxy_autenticacao.validar_login(login.email, login.senha):
+        # Lógica para diferentes tipos de usuários aqui
         if login.email == 'gerente@ifpb.edu.br':
-            return render_template('tela-inicial.html')
+             return render_template('tela-inicial.html')
         if login.email.endswith('@ifpb.edu.br'):
-            return render_template('tela-inicial2.html')
+             return render_template('tela-inicial2.html')
         elif  login.email.endswith('@academico.ifpb.edu.br'):
-            return render_template('tela-inicial3.html')
+             return render_template('tela-inicial3.html')
         else:
-            '<h1> email ou senha incorretos </h1>'
+             '<h1> email ou senha incorretos </h1>'
     else:
-        return '<h1> email ou senha incorretos </h1>'
+        return '<h1> Email ou senha incorretos </h1>'
 
 
 @app.route("/home.html", methods = ["GET", "POST"])
