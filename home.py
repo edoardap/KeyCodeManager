@@ -23,11 +23,8 @@ gerente = Gerente("Jeremias", "12345", "@gmail.com")
 login = TelaLogin()
 funcionario = Funcionario("", "", "", "" )
 
-
 class AutenticadorReal:
     def validar_login(self, email, senha):
-        # Aqui estaria a lógica de validação do login com o supabase
-        # Por questões de simplicidade, vou simular uma validação
         amostra = supabase.table("usuarios").select('email', 'senha').eq("email", login.email).eq("senha", login.senha).execute()
         resp = supabase.table("usuarios").select('id').eq("email", login.email).eq("senha", login.senha).execute()
         if resp.data:
@@ -40,7 +37,6 @@ class ProxyAutenticacao:
         self.autenticador_real = AutenticadorReal()
 
     def validar_login(self, email, senha):
-        # Adicionar lógica adicional de controle de acesso se necessário
         return self.autenticador_real.validar_login(email, senha)
 
 proxy_autenticacao = ProxyAutenticacao()
@@ -53,9 +49,7 @@ def login():
     login.email = request.form.get("email")
     login.senha = request.form.get("senha")
 
-    # Utilizando o proxy para validar o login
     if proxy_autenticacao.validar_login(login.email, login.senha):
-        # Lógica para diferentes tipos de usuários aqui
         if login.email == 'gerente@ifpb.edu.br':
              return render_template('tela-inicial.html')
         if login.email.endswith('@ifpb.edu.br'):
@@ -63,10 +57,9 @@ def login():
         elif  login.email.endswith('@academico.ifpb.edu.br'):
              return render_template('tela-inicial3.html')
         else:
-             '<h1> email ou senha incorretos </h1>'
+             '<h1> Email ou senha incorretos </h1>'
     else:
         return '<h1> Email ou senha incorretos </h1>'
-
 
 @app.route("/home.html", methods = ["GET", "POST"])
 def lerQRCODE(mirror=False):
@@ -102,7 +95,6 @@ def lerQRCODE(mirror=False):
     else:
         return '<h1>Você pegou a chave {}!</h1>'.format(chave.getNomeSala())
 
-#Retorna apenas o básico
 @app.route("/acesso.html", methods = ["GET", "POST"])
 def acessarChaves():
    chaves = gerente.AcessarChavesCadastradas(gerenciador)
@@ -112,7 +104,6 @@ def acessarChaves():
 def retornarNomePeloID(id):
     user_name = supabase.table("usuarios").select('nome').eq("id", id).execute()
     name = user_name.data[0].get('nome')
-    print(name)
     return name
 
 @app.route("/gerar_qrcode/<cod>/<name>", methods=["GET", "POST"])
@@ -130,8 +121,7 @@ def acessarUsuarios():
 
 @app.route("/deleteUsuario/<id>", methods=["GET", "POST"])
 def deleteUsuario(id):
-    adapter = adapterBD()
-    adapter.deleteUsuario(id)
+    gerenciador.removerUsuario(id)
     return '<h1> Usuário removido com sucesso </h1>'
 
 @app.route('/chave.html')

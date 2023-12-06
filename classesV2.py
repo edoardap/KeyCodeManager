@@ -353,8 +353,6 @@ class Aluno(Usuario):
     def passarChave(self, funcionario):
         pass
 
-##Adicionei da branch de jeremias
-
 class adapterBD:
     def __init__(self):
         pass
