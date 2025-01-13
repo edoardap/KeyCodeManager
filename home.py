@@ -1,11 +1,26 @@
 import cv2
 import numpy as np
-from pyzbar.pyzbar import decode
+
 import keyboard
 from classesV2 import *
+from Models.tela_login import TelaLogin
+from Models.Chave import Chave
+from Models.Chave import chave_bp
+from Models.Usuario import Usuario
+from Models.Funcionario import Funcionario
+from Models.QrCode import QRCode, QRCode_bp
+from Models.Aluno import Aluno
+from Models.Professor import Professor
+from Models.AdapterBD import adapterBD
+from Models.Gerenciador import Gerenciador
+from Models.Gerente import Gerente
 
 from flask import Flask, render_template, request, redirect, send_file
 app=Flask(__name__,template_folder='Templates',static_folder="static")
+
+app.register_blueprint(chave_bp, url_prefix='/chave')
+app.register_blueprint(QRCode_bp, url_prefix='/QRCode')
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -20,24 +35,27 @@ supabase = create_client(supabaseUrl, supabaseKey)
 adaptador_bd = adapterBD()
 gerenciador = Gerenciador(adaptador_bd)
 gerente = Gerente("Jeremias", "12345", "@gmail.com")
-login = TelaLogin()
+loginVariavel = TelaLogin()
 funcionario = Funcionario("", "", "", "" )
 
 class AutenticadorReal:
-    def validar_login(self, email, senha):
-        amostra = supabase.table("usuarios").select('email', 'senha').eq("email", login.email).eq("senha", login.senha).execute()
-        resp = supabase.table("usuarios").select('id').eq("email", login.email).eq("senha", login.senha).execute()
-        if resp.data:
-           login.id = resp.data[0].get('id')
-        if(amostra.data != []):
+    def validar_login(self, loginVariavel):
+       # Usando os métodos getters da classe TelaLogin
+       amostra = supabase.table("usuarios").select('email', 'senha').eq("email",loginVariavel.getEmail()).eq("senha", loginVariavel.getSenha()).execute()
+       resp = supabase.table("usuarios").select('id').eq("email", loginVariavel.getEmail()).eq("senha", loginVariavel.getSenha()).execute()
+       if resp.data:
+            loginVariavel.setId(resp.data[0].get('id'))  # Usando o método setter para definir o id
+            print('login_id', loginVariavel.getId())  # Usando o método getter para pegar o id
+       if amostra.data and resp.data:
            return True
 
 class ProxyAutenticacao:
     def __init__(self):
         self.autenticador_real = AutenticadorReal()
 
-    def validar_login(self, email, senha):
-        return self.autenticador_real.validar_login(email, senha)
+    def validar_login(self, loginVariavel):
+        # Passa o objeto 'login' para o método 'validar_login' da classe AutenticadorReal
+        return self.autenticador_real.validar_login(loginVariavel)
 
 proxy_autenticacao = ProxyAutenticacao()
 
@@ -46,54 +64,22 @@ def login():
     if request.method == "GET":
         return render_template('login.html')
 
-    login.email = request.form.get("email")
-    login.senha = request.form.get("senha")
+    # Atribuindo os valores do formulário à instância login
+    loginVariavel.setEmail(request.form.get("email"))
+    loginVariavel.setSenha(request.form.get("senha"))
 
-    if proxy_autenticacao.validar_login(login.email, login.senha):
-        if login.email == 'gerente@ifpb.edu.br':
-             return render_template('tela-inicial.html')
-        if login.email.endswith('@ifpb.edu.br'):
-             return render_template('tela-inicial2.html')
-        elif  login.email.endswith('@academico.ifpb.edu.br'):
-             return render_template('tela-inicial3.html')
+    if proxy_autenticacao.validar_login(loginVariavel):
+        if loginVariavel.getEmail() == 'gerente@ifpb.edu.br':
+            return render_template('tela-inicial.html')
+        elif loginVariavel.getEmail().endswith('@ifpb.edu.br'):
+            return render_template('tela-inicial2.html')
+        elif loginVariavel.getEmail().endswith('@academico.ifpb.edu.br'):
+            return render_template('tela-inicial3.html')
         else:
-             '<h1> Email ou senha incorretos </h1>'
+            return '<h1> Email ou senha incorretos </h1>'
     else:
-        return '<h1> Email ou senha incorretos </h1>'
+        return '<h1> Email ou senha incorretos 2</h1>'
 
-@app.route("/home.html", methods = ["GET", "POST"])
-def lerQRCODE(mirror=False):
-    cam = cv2.VideoCapture(0)
-    cam.set(3, 640)
-    cam.set(4, 480)
-    myData = None
-    while True:
-        ret_val, img = cam.read()
-        if mirror:
-            img = cv2.flip(img, 1)
-        cv2.imshow('Leitor', img)
-        for barcode in decode(img):
-            # print(barcode.data)
-            myData = barcode.data.decode('utf-8')
-            print(myData, flush=True)
-            pts = np.array([barcode.polygon], np.int32)
-            pts = pts.reshape((-1, 1, 2))
-            cv2.polylines(img, [pts], True, (255, 0, 255), 5)
-            pts2 = barcode.rect
-            cv2.putText(img, myData, (pts2[0], pts2[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 165, 0), 2)
-            if myData:
-                break
-
-        if cv2.waitKey(1) == 27 or myData:
-            break
-    cv2.destroyAllWindows()
-    cam.release()
-    chave = Chave(myData, "", "", "")
-    resposta = funcionario.pegarChave(chave, login.id)
-    if resposta == 2:
-        return '<h1>Chave não cadastrada</h1>'
-    else:
-        return '<h1>Você pegou a chave {}!</h1>'.format(chave.getNomeSala())
 
 @app.route("/acesso.html", methods = ["GET", "POST"])
 def acessarChaves():
@@ -106,11 +92,6 @@ def retornarNomePeloID(id):
     name = user_name.data[0].get('nome')
     return name
 
-@app.route("/gerar_qrcode/<cod>/<name>", methods=["GET", "POST"])
-def gerar_qrcode(cod, name):
-    gerador = geradorQRCode()
-    img_path = gerador.gerarQRCode(cod, name)
-    return send_file(img_path, as_attachment=True)
 
 @app.route("/usuarios.html", methods = ["GET", "POST"])
 def acessarUsuarios():
@@ -124,33 +105,7 @@ def deleteUsuario(id):
     gerenciador.removerUsuario(id)
     return '<h1> Usuário removido com sucesso </h1>'
 
-@app.route('/chave.html')
-def novaChave():
-    return render_template('nova-chave.html')
 
-@app.route('/adicionarChave', methods=['POST'])
-def adicionarChave():
-    # Obtenha os dados do formulário
-    nome_sala = request.form['nomeSala']
-    qr_code = request.form['qrCode']
-
-    # Nome da tabela no Supabase
-    tabela = 'chaves'
-
-    # Verificar se o registro já existe (assumindo que 'ID' é uma chave única)
-    registro_existente = supabase.table(tabela).select('nomeSala').eq('nomeSala', nome_sala).execute()
-
-
-    if registro_existente.data !=[]:
-        # Se o registro existir, você pode optar por atualizá-lo usando o método update
-        supabase.table(tabela).update([{'nomeSala': nome_sala, 'qrCode': qr_code}]).eq('nomeSala', nome_sala).execute()
-    else:
-        resultados = supabase.table(tabela).select('id').order('id', desc=True).limit(1).single().execute()
-        last_ID = resultados.data['id']+1
-        # Se o registro não existir, insira um novo registro usando o método insert
-        dados_para_adicionar = [{'id': last_ID, 'nomeSala': nome_sala, 'qrCode': qr_code}]
-        resposta = supabase.table(tabela).insert(dados_para_adicionar).execute()
-    return redirect('/chave.html')
 
 @app.route('/addUsuario', methods=['POST'])
 def adicionarUsuario():
