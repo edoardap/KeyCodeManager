@@ -23,6 +23,8 @@ app.register_blueprint(QRCode_bp, url_prefix='/QRCode')
 
 
 from dotenv import load_dotenv
+from flask import session
+
 load_dotenv()
 
 import os
@@ -36,7 +38,7 @@ adaptador_bd = adapterBD()
 gerenciador = Gerenciador(adaptador_bd)
 gerente = Gerente("Jeremias", "12345", "@gmail.com")
 loginVariavel = TelaLogin()
-funcionario = Funcionario("", "", "", "" )
+app.secret_key = '12345'
 
 class AutenticadorReal:
     def validar_login(self, loginVariavel):
@@ -45,7 +47,7 @@ class AutenticadorReal:
        resp = supabase.table("usuarios").select('id').eq("email", loginVariavel.getEmail()).eq("senha", loginVariavel.getSenha()).execute()
        if resp.data:
             loginVariavel.setId(resp.data[0].get('id'))  # Usando o método setter para definir o id
-            print('login_id', loginVariavel.getId())  # Usando o método getter para pegar o id
+            session['user_id'] = loginVariavel.getId()  # Salvando o id do usuário na sessão
        if amostra.data and resp.data:
            return True
 
@@ -64,16 +66,20 @@ def login():
     if request.method == "GET":
         return render_template('login.html')
 
-    # Atribuindo os valores do formulário à instância login
     loginVariavel.setEmail(request.form.get("email"))
     loginVariavel.setSenha(request.form.get("senha"))
 
     if proxy_autenticacao.validar_login(loginVariavel):
         if loginVariavel.getEmail() == 'gerente@ifpb.edu.br':
+            session['user_type'] = 'gerente'
             return render_template('tela-inicial.html')
+
         elif loginVariavel.getEmail().endswith('@ifpb.edu.br'):
+            session['user_type'] = 'professor'
             return render_template('tela-inicial2.html')
+
         elif loginVariavel.getEmail().endswith('@academico.ifpb.edu.br'):
+            session['user_type'] = 'aluno'
             return render_template('tela-inicial3.html')
         else:
             return '<h1> Email ou senha incorretos </h1>'

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Chave</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        h1 {
+            color: #007bff;
+        }
+        a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Você pegou a chave {{ nome_sala }}!</h1>
+        <div class="body2">
+        <div class ="buttons-container ">
+                <div class="row mb-4">
+                    <div class="col-6 text-center">
+                        <i class="bi bi-qr-code-scan icone-dashboard"></i>
+                        <a href={{ tipoUser }} class="btn btn-dark-blue btn-block">Voltar à Tela Inicial</a>
+                    </div>
+
+                 </div>
+            </div>
+        </div>
+</body>
+</html>

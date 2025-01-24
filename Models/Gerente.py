@@ -1,5 +1,10 @@
 from Models.Funcionario import Funcionario
-from Models.Usuario import Usuario
+from supabase import create_client
+supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
+supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
+supabase = create_client(supabaseUrl, supabaseKey)
+from flask import render_template, url_for
+
 
 class Gerente(Funcionario):
     def __init__(self, nome="", senha="", email="", contrato="", id=""):
@@ -34,4 +39,17 @@ class Gerente(Funcionario):
 
     def removerUsuario(self, usuario, gerenciador):
         gerenciador.removerUsuario(usuario)
+
+    def pegarChave(self, chave, id_user):
+        table = supabase.table("chaves").select('id', 'nomeSala', 'qrCode', 'posse').eq("qrCode", chave.getQrCode()).execute()
+
+        if table.data != []:
+            chave.setId( table.data[0]['id'])
+            chave.setNomeSala(table.data[0]['nomeSala'])
+            chave.setQrCode(table.data[0]['qrCode'])
+            chave.setPosse(table.data[0]['posse'])
+            supabase.table('chaves').update([{'posse': id_user}]).eq('id', chave.getId()).execute()
+            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='tela-inicial3.html')
+        else:
+            return '<h1>Chave não cadastrada</h1>'
 

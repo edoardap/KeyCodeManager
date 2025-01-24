@@ -1,8 +1,19 @@
 import qrcode
 import cv2
 from pyzbar.pyzbar import decode
+import numpy as np
+
+from Models.Aluno import Aluno
+from Models.Chave import Chave
+from Models.Funcionario import Funcionario
 from flask import Blueprint
+from flask import render_template
+
+from Models.Gerente import Gerente
+from Models.Professor import Professor
+
 QRCode_bp = Blueprint('QRCode', __name__, template_folder='../Templates')
+from flask import session
 
 @QRCode_bp.route("/gerarQRCode/<cod>/<name>", methods = ["GET", "POST"])
 class QRCode():
@@ -63,11 +74,20 @@ def lerQRCODE(mirror=False):
     cv2.destroyAllWindows()
     cam.release()
     chave = Chave("", "", myData, "")
-    print('login', loginVariavel.getId())
 
-    resposta = funcionario.pegarChave(chave, loginVariavel.getId())
+    user_id = session.get('user_id')  # Obtém o ID do usuário armazenado na sessão
+    usertype = session.get('user_type')
 
-    if resposta == 2:
-        return '<h1>Chave não cadastrada</h1>'
+    if usertype == 'aluno':
+        aluno = Aluno("", "", "", "")
+        return aluno.pegarChave(chave, user_id)
+
+    elif usertype == 'professor':
+        professor = Professor("", "", "", "", "")
+        return professor.pegarChave(chave, user_id)
+
+    elif usertype == 'gerente':
+        gerente = Gerente("", "", "")
+        return gerente.pegarChave(chave, user_id)
     else:
-        return '<h1>Você pegou a chave {}!</h1>'.format(chave.getNomeSala())
+        return "Tipo de usuário inválido."
