@@ -41,15 +41,19 @@ class Gerente(Funcionario):
         gerenciador.removerUsuario(usuario)
 
     def pegarChave(self, chave, id_user):
+        print('chave', chave.getQrCode())
         table = supabase.table("chaves").select('id', 'nomeSala', 'qrCode', 'posse').eq("qrCode", chave.getQrCode()).execute()
+        if chave.getQrCode() == '5':
+            table = supabase.table("chaves").select('id', 'nomeSala', 'qrCode', 'posse').eq("qrCode", 'Laboratório de Informática 5').execute()
 
+        print()
         if table.data != []:
             chave.setId( table.data[0]['id'])
             chave.setNomeSala(table.data[0]['nomeSala'])
             chave.setQrCode(table.data[0]['qrCode'])
             chave.setPosse(table.data[0]['posse'])
             supabase.table('chaves').update([{'posse': id_user}]).eq('id', chave.getId()).execute()
-            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='tela-inicial3.html')
+            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial')
         else:
             return '<h1>Chave não cadastrada</h1>'
 

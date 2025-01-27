@@ -19,7 +19,7 @@ from flask import Flask, render_template, request, redirect, send_file
 app=Flask(__name__,template_folder='Templates',static_folder="static")
 
 app.register_blueprint(chave_bp, url_prefix='/chave')
-app.register_blueprint(QRCode_bp, url_prefix='/QRCode')
+app.register_blueprint(QRCode_bp)
 
 
 from dotenv import load_dotenv
@@ -86,6 +86,9 @@ def login():
     else:
         return '<h1> Email ou senha incorretos 2</h1>'
 
+@app.route("/tela-inicial", methods=["GET"])
+def telaInicialGerente():
+    return render_template('tela-inicial.html')
 
 @app.route("/acesso.html", methods = ["GET", "POST"])
 def acessarChaves():

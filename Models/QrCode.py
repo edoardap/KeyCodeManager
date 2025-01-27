@@ -12,11 +12,10 @@ from flask import render_template
 from Models.Gerente import Gerente
 from Models.Professor import Professor
 
-QRCode_bp = Blueprint('QRCode', __name__, template_folder='../Templates')
-from flask import session
+QRCode_bp = Blueprint('QRCode', __name__, template_folder='../Templates',url_prefix='/QRcode')
+from flask import session, send_file
 
-@QRCode_bp.route("/gerarQRCode/<cod>/<name>", methods = ["GET", "POST"])
-class QRCode():
+class QRCode:
 #     def __init__(self, cod):
 #         self.codigo = cod
 #
@@ -30,21 +29,25 @@ class QRCode():
       return self.codigo
 
     def gerarQRCode(self, cod, name):
-      img = qrcode.make(cod)
-      img = qrcode.make(cod)
-      img_path = name + ".jpg"
-      img.save(img_path)
-      return img_path
-      if os.path.exists(img_path):
-         return f"QR Code gerado com sucesso e salvo em {img_path}"
-      else:
-         return "Falha ao gerar o QR Code"
+        img = qrcode.make(cod)
+        img_path = name + ".jpg"
+        img.save(img_path)
+        return img_path
+        if os.path.exists(img_path):
+            return img_path
+        else:
+            return None
 
-@QRCode_bp.route("/gerar_qrcode/<cod>/<name>", methods=["GET", "POST"])
+@QRCode_bp.route("/gerar_qrcode/<cod>/<name>", methods=["POST"])
 def gerar_qrcode(cod, name):
-    gerador = geradorQRCode()
+    gerador = QRCode()
     img_path = gerador.gerarQRCode(cod, name)
-    return send_file(img_path, as_attachment=True)
+    print('code', cod)
+    print('name', name)
+    if img_path:
+        return send_file(img_path, mimetype='image/jpeg', as_attachment=True)
+    else:
+        return "Falha ao gerar o QR Code", 500
 
 @QRCode_bp.route("/home.html", methods = ["GET", "POST"])
 def lerQRCODE(mirror=False):
