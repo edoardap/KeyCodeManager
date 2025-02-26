@@ -14,6 +14,7 @@ from Models.Professor import Professor
 from Models.AdapterBD import adapterBD
 from Models.Gerenciador import Gerenciador
 from Models.Gerente import Gerente
+from api.AdapterDB import AdapterDB
 
 from flask import Flask, render_template, request, redirect, send_file
 app=Flask(__name__,template_folder='Templates',static_folder="static")
@@ -34,22 +35,27 @@ supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
 supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
 supabase = create_client(supabaseUrl, supabaseKey)
 
-adaptador_bd = adapterBD()
-gerenciador = Gerenciador(adaptador_bd)
+adapter = AdapterDB(host="localhost", user="manager", password="K@qr0208", database="keycode")
+gerenciador = Gerenciador(adapter)
 gerente = Gerente("Jeremias", "12345", "@gmail.com")
 loginVariavel = TelaLogin()
 app.secret_key = '12345'
 
 class AutenticadorReal:
     def validar_login(self, loginVariavel):
-       # Usando os métodos getters da classe TelaLogin
-       amostra = supabase.table("usuarios").select('email', 'senha').eq("email",loginVariavel.getEmail()).eq("senha", loginVariavel.getSenha()).execute()
-       resp = supabase.table("usuarios").select('id').eq("email", loginVariavel.getEmail()).eq("senha", loginVariavel.getSenha()).execute()
-       if resp.data:
-            loginVariavel.setId(resp.data[0].get('id'))  # Usando o método setter para definir o id
-            session['user_id'] = loginVariavel.getId()  # Salvando o id do usuário na sessão
-       if amostra.data and resp.data:
-           return True
+        # Buscar usuário no banco pelo email
+        usuarios = adapter.get_usuarios(email=loginVariavel.getEmail())
+
+        if usuarios:
+            usuario = usuarios[0]  # Pegamos o primeiro usuário encontrado
+
+            # Verifica se a senha está correta
+            if usuario["senha"] == loginVariavel.getSenha():
+                loginVariavel.setId(usuario["id"])  # Define o ID do usuário
+                session['user_id'] = loginVariavel.getId()  # Salva o ID na sessão
+                return True
+
+        return False  # Retorna False se o login falhar
 
 class ProxyAutenticacao:
     def __init__(self):
@@ -70,7 +76,7 @@ def login():
     loginVariavel.setSenha(request.form.get("senha"))
 
     if proxy_autenticacao.validar_login(loginVariavel):
-        if loginVariavel.getEmail() == 'gerente@ifpb.edu.br':
+        if loginVariavel.getEmail() == 'gerencia@email.com':
             session['user_type'] = 'gerente'
             return render_template('tela-inicial.html')
 
@@ -81,10 +87,8 @@ def login():
         elif loginVariavel.getEmail().endswith('@academico.ifpb.edu.br'):
             session['user_type'] = 'aluno'
             return render_template('tela-inicial3.html')
-        else:
-            return '<h1> Email ou senha incorretos </h1>'
-    else:
-        return '<h1> Email ou senha incorretos 2</h1>'
+
+    return '<h1>Email ou senha incorretos</h1>'
 
 @app.route("/tela-inicial", methods=["GET"])
 def telaInicialGerente():
