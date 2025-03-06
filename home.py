@@ -22,18 +22,10 @@ app=Flask(__name__,template_folder='Templates',static_folder="static")
 app.register_blueprint(chave_bp, url_prefix='/chave')
 app.register_blueprint(QRCode_bp)
 
-
 from dotenv import load_dotenv
 from flask import session
 
 load_dotenv()
-
-import os
-from supabase import create_client
-
-supabaseUrl = 'https://xisosulvxhowoxbcpkuo.supabase.co'
-supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpc29zdWx2eGhvd294YmNwa3VvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5ODg3NzQwNSwiZXhwIjoyMDE0NDUzNDA1fQ.IisZMCnX8ZVTVkpxMu_H9PZ8lIST0fI6QfsVDu1qMUA'
-supabase = create_client(supabaseUrl, supabaseKey)
 
 adapter = AdapterDB(host="localhost", user="manager", password="K@qr0208", database="keycode")
 gerenciador = Gerenciador(adapter)
@@ -94,31 +86,30 @@ def login():
 def telaInicialGerente():
     return render_template('tela-inicial.html')
 
+@app.route("/tela-inicial2", methods=["GET"])
+def telaInicialProfessor():
+    return render_template('tela-inicial2.html')
+
+@app.route("/tela-inicial3", methods=["GET"])
+def telaInicialAluno():
+    return render_template('tela-inicial3.html')
+
 @app.route("/acesso.html", methods = ["GET", "POST"])
 def acessarChaves():
-   chaves = gerente.AcessarChavesCadastradas(gerenciador)
-   for chave in chaves.data:
-       return render_template('acessar-chaves.html', chaves=chaves, retornarNomePeloID=retornarNomePeloID)
-
-def retornarNomePeloID(id):
-    user_name = supabase.table("usuarios").select('nome').eq("id", id).execute()
-    name = user_name.data[0].get('nome')
-    return name
-
+    adapter.connection.commit()
+    chaves = adapter.get_chaves()
+    return render_template('acessar-chaves.html', chaves=chaves)
 
 @app.route("/usuarios.html", methods = ["GET", "POST"])
 def acessarUsuarios():
     if request.method == "GET":
-      usuarios = supabase.table('usuarios').select('id','nome','email').execute()
-      for usuario in usuarios.data:
-         return render_template('acessar-usuarios.html', usuario = usuarios)
+      usuarios = adapter.get_usuarios()
+      return render_template('acessar-usuarios.html', usuario = usuarios)
 
 @app.route("/deleteUsuario/<id>", methods=["GET", "POST"])
 def deleteUsuario(id):
-    gerenciador.removerUsuario(id)
+    adapter.remove_usuario(id)
     return '<h1> Usuário removido com sucesso </h1>'
-
-
 
 @app.route('/addUsuario', methods=['POST'])
 def adicionarUsuario():
@@ -127,40 +118,42 @@ def adicionarUsuario():
     nome = request.form['logname']
     senha = request.form['logpass']
 
-    # Nome da tabela no Supabase
-    tabela = 'usuarios'
 
-    # Verificar se o registro já existe (assumindo que 'ID' é uma chave única)
-    registro_existente = supabase.table(tabela).select('email').eq('email', email).execute()
-
-
-    if registro_existente.data !=[]:
-        # Se o registro existir, você pode optar por atualizá-lo usando o métod{{url_for('novaChave')}}o update
-        supabase.table(tabela).update([{'nome': nome, 'email': email, 'senha' :senha}]).eq('email', email).execute()
+    usuario_existente = adapter.get_usuarios(email=email)
+    if usuario_existente:
+        # Atualizar os dados do usuário se já existir
+        query = "UPDATE usuarios SET nome = %s, senha = %s WHERE email = %s"
+        params = (nome, senha, email)
+        adapter.execute_query(query, params)
     else:
-        resultados = supabase.table(tabela).select('id').order('id', desc=True).limit(1).single().execute()
-        last_ID = resultados.data['id']+1
-        # Se o registro não existir, insira um novo registro usando o método insert
-        dados_para_adicionar = [{'id': last_ID, 'nome': nome, 'email': email,'senha':senha}]
-        resposta = supabase.table(tabela).insert(dados_para_adicionar).execute()
+        # Inserir novo usuário
+        adapter.add_usuario(nome, email, senha)
     return redirect('/')
 
-@app.route("/acessarHistorico", methods = ["GET", "POST"])
+@app.route("/acessarHistorico", methods=["GET", "POST"])
 def acessarHistorico():
-    #query = """SELECT historico.hora,chaves.nomeChave,usuarios.nomeUsuario FROM historico JOIN chaves ON historico.idChave = chaves.id JOIN usuarios ON historico.idUsuario = usuarios.id;"""
-    #controle = supabase.query(query)
-    if request.method == 'GET':
-        historicos = supabase.table('historico').select('id', 'hora', 'id_chave', 'id_usuario').execute()
-#         id = historicos.data[0].get('id_chave')
-#         retornarChavePeloID(id)
+    # Parâmetros que podem ser passados pela requisição
+    data_inicio = request.args.get('data_inicio', '')
+    data_fim = request.args.get('data_fim', '')
+    hora_inicio = request.args.get('hora_inicio', '')
+    hora_fim = request.args.get('hora_fim', '')
+    chave = request.args.get('chave', 0, type=int)
+    usuario_origem = request.args.get('usuario_origem', 0, type=int)
+    usuario_destino = request.args.get('usuario_destino', 0, type=int)
 
-        for historico in historicos.data:
-            return render_template('acessar-historico.html', historico=historicos)
+    # Chama a função para obter o histórico
+    historicos = adapter.get_historico(
+        data_inicio=data_inicio,
+        data_fim=data_fim,
+        hora_inicio=hora_inicio,
+        hora_fim=hora_fim,
+        chave=chave,
+        usuario_origem=usuario_origem,
+        usuario_destino=usuario_destino
+    )
 
-def retornarChavePeloID(id):
-      chave = supabase.table('chaves').select('nomeSala').eq("id", id).execute()
-      nomeSala = chave.data[0].get('nomeSala')
-      return nomeSala
+    # Renderiza o template com os históricos encontrados
+    return render_template('acessar-historico.html', historicos=historicos)
 
 if __name__ == "__main__":
     app.run(debug=True)

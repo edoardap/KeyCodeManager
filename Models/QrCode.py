@@ -14,6 +14,9 @@ from Models.Professor import Professor
 
 QRCode_bp = Blueprint('QRCode', __name__, template_folder='../Templates',url_prefix='/QRcode')
 from flask import session, send_file
+from api.AdapterDB import AdapterDB
+
+adapter = AdapterDB(host="localhost", user="manager", password="K@qr0208", database="keycode")
 
 class QRCode:
 #     def __init__(self, cod):
@@ -80,17 +83,22 @@ def lerQRCODE(mirror=False):
 
     user_id = session.get('user_id')  # Obtém o ID do usuário armazenado na sessão
     usertype = session.get('user_type')
+    chave = adapter.buscar_chave_por_qrcode(chave.getQrCode()) #Pega obj completo
 
     if usertype == 'aluno':
         aluno = Aluno("", "", "", "")
-        return aluno.pegarChave(chave, user_id)
+        if adapter.pegarChave(chave, user_id):
+            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial3')
 
     elif usertype == 'professor':
         professor = Professor("", "", "", "", "")
-        return professor.pegarChave(chave, user_id)
+        if adapter.pegarChave(chave, user_id):
+            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial2')
 
     elif usertype == 'gerente':
         gerente = Gerente("", "", "")
-        return gerente.pegarChave(chave, user_id)
+        if adapter.pegarChave(chave, user_id):
+            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial')
+
     else:
         return "Tipo de usuário inválido."

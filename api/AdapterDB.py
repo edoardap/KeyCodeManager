@@ -93,57 +93,36 @@ class AdapterDB:
 
         return self.fetch_all(query, params)
 
-    def get_historico(self, somente_ativos = True, id = 0, data_inicio = '', data_fim = '',
-                      hora_inicio = '', hora_fim = '', data = '', hora = '', chave = 0,
-                      usuario_origem = 0, usuario_destino = 0):
+    def get_historico(self, data_inicio, data_fim, hora_inicio, hora_fim, chave, usuario_origem, usuario_destino):
+        query = """
+            SELECT h.*, c.nome AS nome_chave, u.nome AS nome_usuario_origem
+            FROM historico h
+            LEFT JOIN chaves c ON h.chave = c.id
+            LEFT JOIN usuarios u ON h.usuario_origem = u.id
+            WHERE 1=1
+        """
+        params = []
 
-        query = "SELECT * FROM historico WHERE 1=1"
-        params = []  # Lista para armazenar os valores dos parâmetros
-
-        if somente_ativos:
-            query += " AND ativo = %s"
-            params.append(1)
-
-        if id != 0:
-            query += " AND id = %s"
-            params.append(id)
-
-        if data:
-            query += " AND DATE(datahora) = %s"
-            params.append(data)
-
-        else:
-            if data_inicio:
-                query += " AND DATE(datahora) >= %s"
-                params.append(data_inicio)
-
-            if data_fim:
-                query += " AND DATE(datahora) <= %s"
-                params.append(data_fim)
-
-        if hora:
-            query += " AND TIME(datahora) = %s"
-            params.append(hora)
-
-        else:
-            if hora_inicio:
-                query += " AND TIME(datahora) >= %s"
-                params.append(hora_inicio)
-
-            if hora_fim:
-                query += " AND TIME(datahora) <= %s"
-                params.append(hora_fim)
-
-        if chave != 0:
-            query += " AND chave = %s"
+        if data_inicio:
+            query += " AND h.datahora >= %s"
+            params.append(data_inicio)
+        if data_fim:
+            query += " AND h.datahora <= %s"
+            params.append(data_fim)
+        if hora_inicio:
+            query += " AND h.datahora >= %s"
+            params.append(hora_inicio)
+        if hora_fim:
+            query += " AND h.datahora <= %s"
+            params.append(hora_fim)
+        if chave:
+            query += " AND h.chave = %s"
             params.append(chave)
-
-        if usuario_origem != 0:
-            query += " AND usuario_origem = %s"
+        if usuario_origem:
+            query += " AND h.usuario_origem = %s"
             params.append(usuario_origem)
-
-        if usuario_destino != 0:
-            query += " AND usuario_destino = %s"
+        if usuario_destino:
+            query += " AND h.usuario_destino = %s"
             params.append(usuario_destino)
 
         return self.fetch_all(query, params)
@@ -184,8 +163,10 @@ class AdapterDB:
     def add_chave(self, nome, qrcode):
         query = "INSERT INTO chaves (nome, qrcode, posse) VALUES (%s, %s, %s)"
         params = (nome, qrcode, 1)
-
-        return self.execute_query(query, params)
+        resultado = self.execute_query(query, params)
+        self.connection.commit()  # Confirma a  transação
+        self.connection.close()  # Fecha a conexão para garantir atualização
+        return resultado
 
     def add_historico(self, chave, usuario_origem, usuario_destino, datahora = None):
         if datahora is None:
@@ -232,6 +213,23 @@ class AdapterDB:
         params.append(id)
 
         return self.execute_query(query, params)
+
+    def pegarChave(self, chave, id_user):
+        cursor = self.connection.cursor()
+
+        # Atualiza a posse da chave diretamente pelo QR Code
+        update_query = "UPDATE chaves SET posse = %s WHERE qrcode = %s"
+        cursor.execute(update_query, (id_user, chave.getQrCode()))
+        self.connection.commit()
+
+        # Verifica se alguma linha foi modificada
+        if cursor.rowcount > 0:
+            return True
+           #print("Chave atualizada com sucesso!")
+
+        cursor.close()
+        return 2  # Indica erro
+
 
     def edit_chave(self, id, nome = None, qrcode = None, posse = None):
 
@@ -336,3 +334,25 @@ class AdapterDB:
         params.append(id)
 
         return self.execute_query(query, params)
+
+    def buscar_chave_por_qrcode(self, qrcode):
+        from Models.Chave import Chave
+
+        # Criar a query para buscar a chave no banco de dados
+        query = "SELECT * FROM chaves WHERE qrcode = %s"
+        params = (qrcode,)
+
+        # Executa a query e retorna o resultado
+        resultado = self.fetch_one(query, params)  # Assumindo que fetch_one é um método que retorna um único resultado
+
+        # Verificar se algum resultado foi encontrado
+        if resultado:
+            # Caso encontre, retorna os dados da chave
+            chave = Chave("","","","")  # Criando um objeto chave
+            chave.setId(resultado['id'])
+            chave.setNomeSala(resultado['nome'])
+            chave.setQrCode(resultado['qrcode'])
+            chave.setPosse(resultado['posse'])
+            return chave  # Retorna o objeto chave preenchido
+        else:
+            return None  # Caso não encontre a chave com o qrcode especificado
