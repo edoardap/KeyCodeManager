@@ -356,3 +356,34 @@ class AdapterDB:
             return chave  # Retorna o objeto chave preenchido
         else:
             return None  # Caso não encontre a chave com o qrcode especificado
+
+    # Função para obter os alunos autorizados pelo professor
+    def obter_alunos_autorizados(self, professor_id):
+
+        cursor = self.connection.cursor()
+
+        # Consulta SQL para obter os alunos autorizados
+        query = """
+        SELECT 
+            a.id AS aluno_id,
+            a.nome AS aluno_nome,
+            ac.chave AS chave,
+            u.nome AS responsavel_nome,
+            u.email AS responsavel_email
+        FROM 
+            alunos_chaves ac
+        JOIN 
+            usuarios a ON ac.aluno = a.id
+        JOIN 
+            usuarios u ON ac.responsavel = u.id
+        WHERE 
+            ac.responsavel = %s;
+        """
+
+        cursor.execute(query, (professor_id,))
+        alunos_autorizados = cursor.fetchall()
+
+        # Fecha a conexão
+        cursor.close()
+        self.connection.commit()  # Confirma a  transação
+        return alunos_autorizados

@@ -130,6 +130,13 @@ def adicionarUsuario():
         adapter.add_usuario(nome, email, senha)
     return redirect('/')
 
+@app.route("/alunosAutorizados", methods=["GET", "POST"])
+def alunosAutorizados():
+    professor_id = session.get('user_id')  # Obtém o ID do professor logado
+    print(professor_id)
+    alunos_autorizados = adapter.obter_alunos_autorizados(professor_id)
+    return render_template('Alunos-autorizados.html', alunos_autorizados=alunos_autorizados)
+
 @app.route("/acessarHistorico", methods=["GET", "POST"])
 def acessarHistorico():
     # Parâmetros que podem ser passados pela requisição
