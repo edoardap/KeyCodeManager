@@ -16,7 +16,8 @@ from Models.Gerenciador import Gerenciador
 from Models.Gerente import Gerente
 from api.AdapterDB import AdapterDB
 
-from flask import Flask, render_template, request, redirect, send_file
+from flask import Flask, render_template, request, redirect, send_file, jsonify
+
 app=Flask(__name__,template_folder='Templates',static_folder="static")
 
 app.register_blueprint(chave_bp, url_prefix='/chave')
@@ -161,6 +162,52 @@ def acessarHistorico():
 
     # Renderiza o template com os históricos encontrados
     return render_template('acessar-historico.html', historicos=historicos)
+
+
+@app.route('/api/dados-graficos')
+def obter_dados():
+    adapter = AdapterDB(host="localhost", user="manager", password="K@qr0208", database="keycode")
+    cursor = adapter.connection.cursor()  # Conectar corretamente
+
+    # 1️⃣ Contar chaves totais
+    cursor.execute("SELECT COUNT(*) FROM chaves")
+    resultado = cursor.fetchone()
+
+    total_chaves = resultado.get('COUNT(*)', 0)  # Retorna 0 se a chave não existir
+
+    # 2️⃣ Contar usuários por categoria
+    cursor.execute("SELECT nivel, COUNT(*) FROM usuarios GROUP BY nivel")
+    usuarios = cursor.fetchall()
+
+    categorias = [row["nivel"] for row in usuarios]  # Níveis de usuário
+    valores = [row["COUNT(*)"] for row in usuarios]  # Quantidade por nível
+
+    # Buscar as 5 chaves mais acessadas e seus nomes
+    cursor.execute("""
+        SELECT chaves.nome, COUNT(historico.id) AS quantidade
+        FROM historico
+        JOIN chaves ON historico.chave = chaves.id
+        GROUP BY chaves.nome
+        ORDER BY quantidade DESC
+        LIMIT 5
+    """)
+    chaves_acessadas = cursor.fetchall()
+
+    nomes_chaves = [row["nome"] for row in chaves_acessadas]  # Agora pega o nome real da chave
+    quantidades = [row["quantidade"] for row in chaves_acessadas]  # Quantidade de acessos
+    # Fechar conexões
+    cursor.close()
+    adapter.connection.close()  # Fechar a conexão corretamente
+
+    return jsonify({
+        "total_chaves": total_chaves,
+        "usuarios": {"categorias": categorias, "valores": valores},
+        "chaves_acessadas": {"nome": nomes_chaves, "quantidades": quantidades}
+    })
+
+@app.route('/acessarGraficos', methods=['GET', 'POST'])
+def acessarGraficos():
+    return render_template('graficos.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

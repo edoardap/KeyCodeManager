@@ -1,57 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='StyleTelaInicial.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <title>KeyCode Manager</title>
+    <style>
+        /* Reset e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #102770;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #4BC0C0;
+        }
+
+        /* Container Principal */
+        .container {
+            padding: 6rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        /* Cards de Botões */
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card i {
+            font-size: 3rem;
+            color: #102770;
+            margin-bottom: 1rem;
+        }
+
+        .card .btn {
+            display: block;
+            background-color: #102770;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .card .btn:hover {
+            background-color: #4BC0C0;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .card i {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg" style="background-color: #102770;">
-    <a class="navbar-brand nav-link" href="#">KeyCode Manager</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">KeyCode Manager</div>
+        <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('login') }}">Sair</a>
             </li>
         </ul>
-    </div>
-</nav>
-<div class="body2">
-    <div class="buttons-container">
-        <div class="row mb-4">
-            <div class="col-4 text-center">
-                <i class="bi bi-qr-code-scan icone-dashboard"></i>
-                <a href="{{ url_for('QRCode.lerQRCODE') }}" class="btn btn-dark-blue btn-block">Pegar Chaves</a>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container">
+        <div class="buttons-container">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <i class="bi bi-qr-code-scan"></i>
+                        <a href="{{ url_for('QRCode.lerQRCODE') }}" class="btn">Pegar Chaves</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <i class="bi bi-key-fill"></i>
+                        <a href="{{ url_for('acessarChaves') }}" class="btn">Acessar Chaves</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <i class="bi bi-people-fill"></i>
+                        <a href="{{ url_for('acessarUsuarios') }}" class="btn">Acessar Usuários</a>
+                    </div>
+                </div>
             </div>
-            <div class="col-4 text-center">
-                <i class="bi bi-key-fill icone-dashboard"></i>
-                <a href="{{ url_for('acessarChaves') }}" class="btn btn-dark-blue btn-block">Acessar Chaves</a>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <i class="bi bi-key"></i>
+                        <a href="{{ url_for('chave.novaChave') }}" class="btn">Nova Chave</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <i class="bi bi-person-circle"></i>
+                        <a href="#" class="btn">Novo Usuário</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <i class="bi bi-list-check"></i>
+                        <a href="{{ url_for('acessarHistorico') }}" class="btn">Acessar Histórico</a>
+                    </div>
+                </div>
             </div>
-            <div class="col-4 text-center">
-                <i class="bi bi-people-fill icone-dashboard"></i>
-                <a href="{{ url_for('acessarUsuarios') }}" class="btn btn-dark-blue btn-block">Acessar Usuários</a>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <i class="bi bi-bar-chart-line"></i>
+                        <a href="{{ url_for('acessarGraficos') }}" class="btn">Acessar Gráficos</a>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-4 text-center">
-                <i class="bi bi-key icone-dashboard"></i>
-                <a href="{{ url_for('chave.novaChave') }}" class="btn btn-dark-blue btn-block">Nova Chave</a>
-            </div>
-            <div class="col-4 text-center">
-                <i class="bi bi-person-circle icone-dashboard"></i>
-                <a href="#" class="btn btn-dark-blue btn-block">Novo Usuário</a>
-            </div>
-            <div class="col-4 text-center">
-                <i class="bi bi-list-check icone-dashboard"></i>
-                <a href="{{ url_for('acessarHistorico') }}" class="btn btn-dark-blue btn-block">Acessar Histórico</a>
-            </div>
-        </div>
     </div>
-</div>
 </body>
 </html>

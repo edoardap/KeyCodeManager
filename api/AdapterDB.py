@@ -1,5 +1,9 @@
 import pymysql
 from datetime import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import sqlite3
 
 class AdapterDB:
     def __init__(self, host, user, password, database):
@@ -165,7 +169,6 @@ class AdapterDB:
         params = (nome, qrcode, 1)
         resultado = self.execute_query(query, params)
         self.connection.commit()  # Confirma a  transação
-        self.connection.close()  # Fecha a conexão para garantir atualização
         return resultado
 
     def add_historico(self, chave, usuario_origem, usuario_destino, datahora = None):

@@ -1,47 +1,93 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmação de Chave</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* Reset e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
             color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
         }
+
+        /* Container Principal */
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
         h1 {
-            color: #007bff;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #102770;
+            margin-bottom: 1.5rem;
         }
-        a {
-            text-decoration: none;
-            color: #fff;
-            background-color: #007bff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 16px;
+
+        .icone-dashboard {
+            font-size: 3rem;
+            color: #102770;
+            margin-bottom: 1rem;
+        }
+
+        .btn-dark-blue {
             display: inline-block;
-            margin-top: 20px;
+            background-color: #102770;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
         }
-        a:hover {
-            background-color: #0056b3;
+
+        .btn-dark-blue:hover {
+            background-color: #4BC0C0;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .icone-dashboard {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Você pegou a chave {{ nome_sala }}!</h1>
-        <div class="body2">
-        <div class ="buttons-container ">
-                <div class="row mb-4">
-                    <div class="col-6 text-center">
-                        <i class="bi bi-qr-code-scan icone-dashboard"></i>
-                        <a href="{{ tipoUser }}" class="btn btn-dark-blue btn-block">Voltar à Tela Inicial</a>
-                    </div>
 
-                 </div>
-            </div>
-        </div>
+    <!-- Container Principal -->
+    <div class="container">
+        <i class="bi bi-qr-code-scan icone-dashboard"></i>
+        <h1>Você pegou a chave <strong>{{ nome_sala }}</strong>!</h1>
+        <a href="{{ tipoUser }}" class="btn-dark-blue">Voltar à Tela Inicial</a>
+    </div>
+
 </body>
 </html>

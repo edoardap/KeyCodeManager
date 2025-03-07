@@ -1,104 +1,287 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt">
 <head>
-	<meta charset="UTF-8">
-	<title>Login/Signup</title>
-	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css'>
-	<link rel='stylesheet' href='https://unicons.iconscout.com/release/v2.1.9/css/unicons.css'>
-	<link rel="stylesheet" href="./static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Cadastro</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Reset e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #102770, #4BC0C0);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Efeito de Partículas (Fundo Dinâmico) */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: float 5s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Container Principal */
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        h4 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px rgba(16, 39, 112, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-style {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-style::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-style:focus {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            outline: none;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #102770, #4BC0C0);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(16, 39, 112, 0.4);
+        }
+
+        .link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .link:hover {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .toggle-form {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .toggle-form a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h4 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div>
-        <img src="./static/KeyCode.png" alt="Minha Imagem" class="imagem">
-    </div>
-	<!-- partial:index.partial.html -->
-	
-	<div class="section posicao">
-		<div class="container">
-			<div class="row full-height justify-content-center">
-				<div class="col-12 text-center align-self-center py-5">
-					<div class="section pb-5 pt-5 pt-sm-2 text-center">
-						<h6 class="mb-0 pb-3" style="color: #102770;"><span>Entrar </span><span>Criar Conta</span></h6>
-						<input class="checkbox" type="checkbox" id="reg-log" name="reg-log" />
-						<label for="reg-log"></label>
-						<div class="card-3d-wrap mx-auto">
-							<div class="card-3d-wrapper">
-								<div class="card-front">
-									<div class="center-wrap">
-										<div class="section text-center">
-											<h4 class="mb-4 pb-3" style="color: #102770;">KeyCode Manager</h4>
-											<form action="{{ url_for('login') }}" method="post">
-											<div class="form-group">
-												<input type="email" name="email" class="form-style"
-													placeholder="Seu Email" id="logemail_c" autocomplete="off">
-												<i class="input-icon uil uil-at"></i>
-											</div>
-											<div class="form-group mt-2">
-												<input type="password" name="senha" class="form-style"
-													placeholder="Sua Senha" id="logpass_c" autocomplete="off">
-												<i class="input-icon uil uil-lock-alt"></i>
-												<i class="input-icon-2 uil-eye-slash" id="passwordToggle"></i>
-											</div>
-											<button type="submit" class="btn mt-4">entrar</button>
-											</form>
-											<p class="mb-0 mt-4 text-center"><a href="#0" class="link"> Esqueceu sua senha?</a></p>
-										</div>
-									</div>
-								</div>
-								<div class="card-back">
-									<div class="center-wrap">
-										<div class="section text-center">
-											<h4 class="mb-4 pb-3">Criar Conta</h4>
-											<form action="{{ url_for('adicionarUsuario') }}" method="post">
-											<div class="form-group">
-												<input type="text" name="logname" class="form-style"
-													placeholder="Seu Nome Completo" id="logname" autocomplete="off">
-												<i class="input-icon uil uil-user"></i>
-											</div>
-											<div class="form-group mt-2">
-												<input type="email" name="logemail_c" class="form-style"
-													placeholder="Seu Email" id="logemail_s" autocomplete="off">
-												<i class="input-icon uil uil-at"></i>
-											</div>
-											<div class="form-group mt-2">
-												<input type="password" name="logpass" class="form-style"
-													placeholder="Sua Senha" id="logpass_s" autocomplete="off">
-												<i class="input-icon uil uil-lock-alt"></i>
-												<i class="input-icon-2 uil-eye-slash" id="passwordToggle"></i>
-											</div>
-											
-											<button type="submit" class="btn mt-4">cadastrar</button>
-											</form>
-										
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- partial -->
 
+    <!-- Efeito de Partículas -->
+    <div class="particles">
+        <div class="particle" style="top: 10%; left: 20%; width: 10px; height: 10px; animation-duration: 6s;"></div>
+        <div class="particle" style="top: 30%; left: 70%; width: 15px; height: 15px; animation-duration: 8s;"></div>
+        <div class="particle" style="top: 60%; left: 40%; width: 12px; height: 12px; animation-duration: 7s;"></div>
+        <div class="particle" style="top: 80%; left: 10%; width: 8px; height: 8px; animation-duration: 9s;"></div>
+    </div>
+
+    <!-- Container Principal -->
+    <div class="container">
+        <h4>KeyCode Manager</h4>
+
+        <!-- Formulário de Login -->
+        <form id="loginForm" action="{{ url_for('login') }}" method="post">
+            <div class="form-group">
+                <input type="email" name="email" class="form-style" placeholder="Seu Email" id="logemail_c" required>
+                <i class="input-icon bi bi-envelope"></i>
+            </div>
+            <div class="form-group">
+                <input type="password" name="senha" class="form-style" placeholder="Sua Senha" id="logpass_c" required>
+                <i class="input-icon bi bi-lock"></i>
+                <i class="input-icon bi bi-eye-slash" id="passwordToggle" style="cursor: pointer; right: 2.5rem;"></i>
+            </div>
+            <button type="submit" class="btn">Entrar</button>
+        </form>
+
+        <!-- Link para Esqueci a Senha -->
+        <p class="link mt-3"><a href="#0">Esqueceu sua senha?</a></p>
+
+        <!-- Alternar entre Login e Cadastro -->
+        <p class="toggle-form">
+            Não tem uma conta? <a href="#" id="toggleSignup">Criar Conta</a>
+        </p>
+
+        <!-- Formulário de Cadastro (Oculto por padrão) -->
+        <form id="signupForm" action="{{ url_for('adicionarUsuario') }}" method="post" style="display: none;">
+            <div class="form-group">
+                <input type="text" name="logname" class="form-style" placeholder="Seu Nome Completo" id="logname" required>
+                <i class="input-icon bi bi-person"></i>
+            </div>
+            <div class="form-group">
+                <input type="email" name="logemail_c" class="form-style" placeholder="Seu Email" id="logemail_s" required>
+                <i class="input-icon bi bi-envelope"></i>
+            </div>
+            <div class="form-group">
+                <input type="password" name="logpass" class="form-style" placeholder="Sua Senha" id="logpass_s" required>
+                <i class="input-icon bi bi-lock"></i>
+                <i class="input-icon bi bi-eye-slash" id="passwordToggleSignup" style="cursor: pointer; right: 2.5rem;"></i>
+            </div>
+            <button type="submit" class="btn">Cadastrar</button>
+        </form>
+
+        <!-- Alternar entre Login e Cadastro -->
+        <p class="toggle-form" id="toggleLoginText" style="display: none;">
+            Já tem uma conta? <a href="#" id="toggleLogin">Entrar</a>
+        </p>
+    </div>
+
+    <script>
+        // Alternar entre Login e Cadastro
+        const loginForm = document.getElementById("loginForm");
+        const signupForm = document.getElementById("signupForm");
+        const toggleSignup = document.getElementById("toggleSignup");
+        const toggleLogin = document.getElementById("toggleLogin");
+        const toggleLoginText = document.getElementById("toggleLoginText");
+
+        toggleSignup.addEventListener("click", (e) => {
+            e.preventDefault();
+            loginForm.style.display = "none";
+            signupForm.style.display = "block";
+            toggleLoginText.style.display = "block";
+            toggleSignup.parentElement.style.display = "none";
+        });
+
+        toggleLogin.addEventListener("click", (e) => {
+            e.preventDefault();
+            signupForm.style.display = "none";
+            loginForm.style.display = "block";
+            toggleLoginText.style.display = "none";
+            toggleSignup.parentElement.style.display = "block";
+        });
+
+        // Mostrar/Ocultar Senha
+        const passwordToggle = document.getElementById("passwordToggle");
+        const passwordField = document.getElementById("logpass_c");
+
+        passwordToggle.addEventListener("click", () => {
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                passwordToggle.classList.remove("bi-eye-slash");
+                passwordToggle.classList.add("bi-eye");
+            } else {
+                passwordField.type = "password";
+                passwordToggle.classList.remove("bi-eye");
+                passwordToggle.classList.add("bi-eye-slash");
+            }
+        });
+
+        const passwordToggleSignup = document.getElementById("passwordToggleSignup");
+        const passwordFieldSignup = document.getElementById("logpass_s");
+
+        passwordToggleSignup.addEventListener("click", () => {
+            if (passwordFieldSignup.type === "password") {
+                passwordFieldSignup.type = "text";
+                passwordToggleSignup.classList.remove("bi-eye-slash");
+                passwordToggleSignup.classList.add("bi-eye");
+            } else {
+                passwordFieldSignup.type = "password";
+                passwordToggleSignup.classList.remove("bi-eye");
+                passwordToggleSignup.classList.add("bi-eye-slash");
+            }
+        });
+    </script>
 </body>
-<script>
-	const passwordToggle = document.getElementById("passwordToggle");
-	const passwordField = document.getElementById("logpass_s");
-  
-	passwordToggle.addEventListener("click", function () {
-	  if (passwordField.type === "password") {
-		passwordField.type = "text";
-		passwordToggle.classList.remove("uil-eye-slash");
-		passwordToggle.classList.add("uil-eye");
-	  } else {
-		passwordField.type = "password";
-		passwordToggle.classList.remove("uil-eye");
-		passwordToggle.classList.add("uil-eye-slash");
-	  }
-	});
-</script>
 </html>
