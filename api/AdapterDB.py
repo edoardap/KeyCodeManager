@@ -72,11 +72,15 @@ class AdapterDB:
 
 
     def get_chaves(self, somente_ativos = True, id = 0, nome = '', posse = 0, qrcode = ''):
-        query = "SELECT * FROM chaves WHERE 1=1"
+        query = """ SELECT c.*, u.nome AS nome_usuario_posse
+        FROM chaves c
+        LEFT JOIN usuarios u ON c.posse = u.id
+        WHERE 1=1
+         """
         params = []  # Lista para armazenar os valores dos parâmetros
 
         if somente_ativos:
-            query += " AND ativo = %s"
+            query += " AND c.ativo = %s"  # Agora está claro que "ativo" vem da tabela "chaves"
             params.append(1)
 
         if id != 0:
@@ -99,10 +103,10 @@ class AdapterDB:
 
     def get_historico(self, data_inicio, data_fim, hora_inicio, hora_fim, chave, usuario_origem, usuario_destino):
         query = """
-            SELECT h.*, c.nome AS nome_chave, u.nome AS nome_usuario_origem
+            SELECT h.*, c.nome AS nome_chave, u.nome AS nome_usuario_destino
             FROM historico h
             LEFT JOIN chaves c ON h.chave = c.id
-            LEFT JOIN usuarios u ON h.usuario_origem = u.id
+            LEFT JOIN usuarios u ON h.usuario_destino = u.id
             WHERE 1=1
         """
         params = []
@@ -227,8 +231,10 @@ class AdapterDB:
 
         # Verifica se alguma linha foi modificada
         if cursor.rowcount > 0:
+            chave = self.buscar_chave_por_qrcode((chave.getQrCode()))
+            self.add_historico(chave.getId(),1, id_user)
+            self.connection.commit()
             return True
-           #print("Chave atualizada com sucesso!")
 
         cursor.close()
         return 2  # Indica erro

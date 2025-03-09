@@ -140,6 +140,8 @@ def alunosAutorizados():
 
 @app.route("/acessarHistorico", methods=["GET", "POST"])
 def acessarHistorico():
+    adapter.connection.commit()
+
     # Parâmetros que podem ser passados pela requisição
     data_inicio = request.args.get('data_inicio', '')
     data_fim = request.args.get('data_fim', '')
