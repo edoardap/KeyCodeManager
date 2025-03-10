@@ -109,6 +109,7 @@ def lerQRCODE(mirror=False):
     elif usertype == 'gerente':
         gerente = Gerente("", "", "")
         result = adapter.pegarChave(chave, user_id)
+        print(result)
         if result:
             return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial')
     else:

@@ -240,9 +240,10 @@ class AdapterDB:
             self.connection.commit()
 
             # Verifica se alguma linha foi modificada
-            if cursor.rowcount > 0:
+            if cursor.rowcount >= 0:
                 chave = self.buscar_chave_por_qrcode((chave.getQrCode()))
-                self.add_historico(chave.getId(), 1, id_user)
+                if chave.getPosse() != id_user:
+                    self.add_historico(chave.getId(), chave.getPosse(), id_user)
                 self.connection.commit()
                 cursor.close()
                 return 2

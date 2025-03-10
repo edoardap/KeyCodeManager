@@ -15,6 +15,7 @@ from Models.AdapterBD import adapterBD
 from Models.Gerenciador import Gerenciador
 from Models.Gerente import Gerente
 from api.AdapterDB import AdapterDB
+import api.servo as servo
 
 from flask import Flask, render_template, request, redirect, send_file, jsonify
 
@@ -86,6 +87,7 @@ def login():
 
 @app.route("/tela-inicial", methods=["GET"])
 def telaInicialGerente():
+    servo.close_lock()
     return render_template('tela-inicial.html')
 
 @app.route("/tela-inicial2", methods=["GET"])
@@ -185,6 +187,10 @@ def obter_dados():
     adapter = AdapterDB(host="localhost", user="manager", password="K@qr0208", database="keycode")
     cursor = adapter.connection.cursor()  # Conectar corretamente
 
+    # Parâmetros de data
+    data_inicio = request.args.get('data_inicio', '')
+    data_fim = request.args.get('data_fim', '')
+
     # 1️⃣ Contar chaves totais
     cursor.execute("SELECT COUNT(*) FROM chaves")
     resultado = cursor.fetchone()
@@ -199,15 +205,30 @@ def obter_dados():
     valores = [row["COUNT(*)"] for row in usuarios]  # Quantidade por nível
 
     # Buscar as 5 chaves mais acessadas e seus nomes
-    cursor.execute("""
+    query_chaves_acessadas = """
         SELECT chaves.nome, COUNT(historico.id) AS quantidade
         FROM historico
         JOIN chaves ON historico.chave = chaves.id
+        WHERE 1=1
+    """
+
+    params = []
+
+    if data_inicio:
+        query_chaves_acessadas += " AND historico.datahora >= %s"
+        params.append(f"{data_inicio} 00:00:00")  # Início do dia
+    if data_fim:
+        query_chaves_acessadas += " AND historico.datahora <= %s"
+        params.append(f"{data_fim} 23:59:59")  # Fim do dia
+
+    query_chaves_acessadas += """
         GROUP BY chaves.nome
         ORDER BY quantidade DESC
         LIMIT 5
-    """)
+    """
+    cursor.execute(query_chaves_acessadas, params)
     chaves_acessadas = cursor.fetchall()
+    print(chaves_acessadas)
 
     nomes_chaves = [row["nome"] for row in chaves_acessadas]  # Agora pega o nome real da chave
     quantidades = [row["quantidade"] for row in chaves_acessadas]  # Quantidade de acessos
