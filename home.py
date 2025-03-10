@@ -81,7 +81,8 @@ def login():
             session['user_type'] = 'aluno'
             return render_template('tela-inicial3.html')
 
-    return '<h1>Email ou senha incorretos</h1>'
+        # Renderiza a página de erro de login
+    return render_template('erro-login.html')
 
 @app.route("/tela-inicial", methods=["GET"])
 def telaInicialGerente():

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro de Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Reset e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #102770;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 2rem;
+        }
+
+        .btn-tentar-novamente {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #102770;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-right: 1rem;
+        }
+
+        .btn-tentar-novamente:hover {
+            background-color: #4BC0C0;
+        }
+
+        .btn-voltar {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #e74c3c;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn-voltar:hover {
+            background-color: #c0392b;
+        }
+
+        /* Ícone de erro */
+        .error-icon {
+            font-size: 4rem;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Ícone de erro -->
+        <div class="error-icon">
+            <i class="bi bi-x-circle-fill"></i>
+        </div>
+
+        <!-- Título -->
+        <h1>Erro de Login</h1>
+
+        <!-- Mensagem -->
+        <p>Email ou senha incorretos. Por favor, tente novamente.</p>
+
+        <!-- Botões -->
+        <a href="{{ url_for('login') }}" class="btn-tentar-novamente">
+            Tentar Novamente
+        </a>
+    </div>
+
+</body>
+</html>
