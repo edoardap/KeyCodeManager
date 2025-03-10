@@ -100,6 +100,7 @@ def lerQRCODE(mirror=False):
     elif usertype == 'professor':
         professor = Professor("", "", "", "", "")
         result = adapter.pegarChave(chave, user_id)
+        print(user_id)
         if result:
             return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial2')
 
