@@ -165,7 +165,6 @@ class AdapterDB:
     def add_usuario(self, nome, email, senha, nivel, matricula = None, telefone = None):
         query = "INSERT INTO usuarios (nome, email, senha, matricula, telefone, nivel) VALUES (%s, %s, %s, %s, %s, %s)"
         params = (nome, email, senha, matricula, telefone, nivel)
-
         return self.execute_query(query, params)
 
     def add_chave(self, nome, qrcode):

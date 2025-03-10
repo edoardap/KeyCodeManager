@@ -112,24 +112,37 @@ def deleteUsuario(id):
     adapter.remove_usuario(id)
     return '<h1> Usuário removido com sucesso </h1>'
 
-@app.route('/addUsuario', methods=['POST'])
+@app.route("/novoUsuario", methods=["GET", "POST"])
+def novoUsuario():
+    return render_template('novo-usuario.html')
+
+@app.route('/adicionarUsuario', methods=['POST'])
 def adicionarUsuario():
     # Obtenha os dados do formulário
-    email = request.form['logemail_c']
-    nome = request.form['logname']
-    senha = request.form['logpass']
+    email = request.form['email']
+    nome = request.form['nome']
+    senha = request.form['senha']
+    confirmar_senha = request.form['confirmarSenha']
+    tipo_usuario = request.form['tipoUsuario']
+    matricula = request.form.get('matricula') or None  # Converte string vazia para None
+    telefone = request.form.get('telefone') or None    # Converte string vazia para None
 
+    # Verificar se as senhas coincidem
+    if senha != confirmar_senha:
+        return "Erro: As senhas não coincidem.", 400
 
+    # Verificar se o usuário já existe
     usuario_existente = adapter.get_usuarios(email=email)
     if usuario_existente:
         # Atualizar os dados do usuário se já existir
-        query = "UPDATE usuarios SET nome = %s, senha = %s WHERE email = %s"
-        params = (nome, senha, email)
+        query = "UPDATE usuarios SET nome = %s, senha = %s, nivel = %s, matricula = %s, telefone = %s WHERE email = %s"
+        params = (nome, senha, tipo_usuario, matricula, telefone, email)
         adapter.execute_query(query, params)
     else:
         # Inserir novo usuário
-        adapter.add_usuario(nome, email, senha)
-    return redirect('/')
+        adapter.add_usuario(nome, email, senha, tipo_usuario, matricula, telefone)
+
+    return redirect('/tela-inicial')  # Redirecionar para a página inicial após o cadastro
 
 @app.route("/alunosAutorizados", methods=["GET", "POST"])
 def alunosAutorizados():
