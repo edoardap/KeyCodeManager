@@ -84,11 +84,11 @@ class AdapterDB:
             params.append(1)
 
         if id != 0:
-            query += " AND id = %s"
+            query += " AND c.id = %s"
             params.append(id)
 
         if nome:
-            query += " AND nome LIKE %s"
+            query += " AND c.nome LIKE %s"
             params.append('%' + nome + '%')
 
         if posse != 0:
