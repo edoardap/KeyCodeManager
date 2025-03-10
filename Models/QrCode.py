@@ -15,6 +15,7 @@ from Models.Professor import Professor
 QRCode_bp = Blueprint('QRCode', __name__, template_folder='../Templates',url_prefix='/QRcode')
 from flask import session, send_file
 from api.AdapterDB import AdapterDB
+import api.servo as servo
 
 adapter = AdapterDB(host="localhost", user="manager", password="K@qr0208", database="keycode")
 
@@ -54,6 +55,7 @@ def gerar_qrcode(cod, name):
 
 @QRCode_bp.route("/home.html", methods = ["GET", "POST"])
 def lerQRCODE(mirror=False):
+    servo.open_lock()
     cam = cv2.VideoCapture(0)
     cam.set(3, 640)
     cam.set(4, 480)
