@@ -110,7 +110,7 @@ def acessarUsuarios():
 @app.route("/deleteUsuario/<id>", methods=["GET", "POST"])
 def deleteUsuario(id):
     adapter.remove_usuario(id)
-    return '<h1> Usuário removido com sucesso </h1>'
+    return render_template('usuario-removido.html')
 
 @app.route("/novoUsuario", methods=["GET", "POST"])
 def novoUsuario():
