@@ -16,3 +16,11 @@ def close_lock():
     #pi.set_servo_pulsewidth(SERVO_GPIO, 0)  # Desativa o servo
     #pi.stop()
 
+#wget https://github.com/joan2937/pigpio/archive/master.zip
+#unzip master.zip
+#cd pigpio-master
+#make
+#sudo make install
+
+#iniciar
+#sudo pigpiod -p 8888
