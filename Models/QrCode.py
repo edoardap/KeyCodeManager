@@ -85,20 +85,38 @@ def lerQRCODE(mirror=False):
     usertype = session.get('user_type')
     chave = adapter.buscar_chave_por_qrcode(chave.getQrCode()) #Pega obj completo
 
+    #Lembrete: mudar para a forma mais eficiente a questap  do tipoUser
     if usertype == 'aluno':
         aluno = Aluno("", "", "", "")
-        if adapter.pegarChave(chave, user_id):
+        result = adapter.pegarChave(chave, user_id)
+
+        if result== 2:
             return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial3')
+        elif result==1:
+            return render_template('sem-acesso-chave.html')
+        elif result==3:
+            return render_template('erro-geral.html')
 
     elif usertype == 'professor':
         professor = Professor("", "", "", "", "")
-        if adapter.pegarChave(chave, user_id):
+        result = adapter.pegarChave(chave, user_id)
+
+        if result==2:
             return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial2')
+        elif result == 1:
+            return render_template('sem-acesso-chave.html')
+        elif result == 3:
+            return render_template('erro-geral.html')
 
     elif usertype == 'gerente':
         gerente = Gerente("", "", "")
-        if adapter.pegarChave(chave, user_id):
-            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial')
+        result = adapter.pegarChave(chave, user_id)
 
+        if result==2:
+            return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial')
+        elif result == 1:
+            return render_template('sem-acesso-chave.html')
+        elif result == 3:
+            return render_template('erro-geral.html')
     else:
         return "Tipo de usuário inválido."

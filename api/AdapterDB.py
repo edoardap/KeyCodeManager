@@ -223,21 +223,36 @@ class AdapterDB:
     def pegarChave(self, chave, id_user):
         cursor = self.connection.cursor()
 
-        # Atualiza a posse da chave diretamente pelo QR Code
-        update_query = "UPDATE chaves SET posse = %s WHERE qrcode = %s"
-        cursor.execute(update_query, (id_user, chave.getQrCode()))
-        self.connection.commit()
 
-        # Verifica se alguma linha foi modificada
-        if cursor.rowcount > 0:
-            chave = self.buscar_chave_por_qrcode((chave.getQrCode()))
-            self.add_historico(chave.getId(),1, id_user)
+        # Verificar se o usuário tem permissão para pegar essa chave
+        check_permission_query = """
+            SELECT 1 FROM alunos_chaves
+            WHERE chave = %s AND aluno = %s
+        """
+        cursor.execute(check_permission_query, (chave.getId(), id_user))
+        permission = cursor.fetchone()
+        print(permission)
+
+        if not permission:
+            print("Usuário não tem permissão para pegar a chave.")
+            cursor.close()
+            return 1  # Indica que o usuário não tem permissão para pegar a chave
+        else:
+            # Atualiza a posse da chave diretamente pelo QR Code
+            update_query = "UPDATE chaves SET posse = %s WHERE qrcode = %s"
+            cursor.execute(update_query, (id_user, chave.getQrCode()))
             self.connection.commit()
-            return True
 
-        cursor.close()
-        return 2  # Indica erro
-
+            # Verifica se alguma linha foi modificada
+            if cursor.rowcount > 0:
+                chave = self.buscar_chave_por_qrcode((chave.getQrCode()))
+                self.add_historico(chave.getId(), 1, id_user)
+                self.connection.commit()
+                cursor.close()
+                return 2
+            else:
+                cursor.close()
+                return 3  # Indica erro geral ou ele ja estava com a chave e tentou pegar ela novamente
 
     def edit_chave(self, id, nome = None, qrcode = None, posse = None):
 
