@@ -100,23 +100,13 @@ def lerQRCODE(mirror=False):
     elif usertype == 'professor':
         professor = Professor("", "", "", "", "")
         result = adapter.pegarChave(chave, user_id)
-
-        if result==2:
+        if result:
             return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial2')
-        elif result == 1:
-            return render_template('sem-acesso-chave.html')
-        elif result == 3:
-            return render_template('erro-geral.html')
 
     elif usertype == 'gerente':
         gerente = Gerente("", "", "")
         result = adapter.pegarChave(chave, user_id)
-
-        if result==2:
+        if result:
             return render_template('chavePega.html', nome_sala=chave.getNomeSala(), tipoUser='/tela-inicial')
-        elif result == 1:
-            return render_template('sem-acesso-chave.html')
-        elif result == 3:
-            return render_template('erro-geral.html')
     else:
         return "Tipo de usuário inválido."
