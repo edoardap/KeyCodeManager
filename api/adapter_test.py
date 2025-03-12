@@ -9,7 +9,7 @@ db = adb.AdapterDB(host="localhost", user="manager", password="K@qr0208", databa
 
 @app.route('/data', methods=['GET'])
 def get_data():
-    data = db.get_alunos_chaves(chave=11)
+    data = db.get_tempo_uso_chave()
     return jsonify(data)
 
 @app.route('/')

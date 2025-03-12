@@ -411,3 +411,21 @@ class AdapterDB:
         cursor.close()
         self.connection.commit()  # Confirma a  transação
         return alunos_autorizados
+
+    def get_tempo_uso_chave(self):
+        query = """
+                WITH movimentacoes AS (
+                    SELECT 
+                        chave, 
+                        datahora AS saida,
+                        LEAD(datahora) OVER (PARTITION BY chave ORDER BY datahora) AS retorno
+                    FROM historico
+                    WHERE usuario_origem = 1
+                )
+                SELECT 
+                    chave, 
+                    SUM(TIMESTAMPDIFF(MINUTE, saida, COALESCE(retorno, NOW()))) AS tempo_total_minutos
+                FROM movimentacoes
+                GROUP BY chave;
+                """
+        return self.fetch_all(query)
