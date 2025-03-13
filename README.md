@@ -3,7 +3,7 @@
 ## Visão Geral
 Este projeto propõe a criação de um **quadro inteligente** para o gerenciamento seguro e eficiente das chaves no IFPB-CG. O sistema busca minimizar os riscos de perda e uso indevido das chaves por meio de um controle automatizado e integrado a uma plataforma web.
 
-----
+
 
 ## Problema Atual
 **Falta de rastreabilidade:** Não é possível saber quem retirou ou devolveu uma chave.
@@ -12,7 +12,7 @@ Este projeto propõe a criação de um **quadro inteligente** para o gerenciamen
 
 **Risco de perda ou uso indevido:** Chaves podem ser retiradas sem autorização ou perdidas sem registro.
 
-----
+
 
 ## Justificativa
 Considerando as limitações do atual sistema de controle de chaves no IFPB-CG, que opera de maneira rudimentar e apresenta brechas para questões de segurança, este projeto propõe uma solução inovadora: um quadro inteligente para o gerenciamento seguro e eficiente das chaves. O objetivo é oferecer uma alternativa que minimize os riscos de perda e uso indevido das chaves, promovendo um controle mais confiável e organizado.
@@ -23,7 +23,30 @@ Este sistema de controle será integrado a uma plataforma web, onde os usuários
 
 Além disso, o sistema permitirá a transferência de chaves entre recebedores, seguindo o mesmo processo de escaneamento e registro. Isso garante que, em todos os momentos, os usuários autorizados saibam com quem estão as chaves, aumentando a rastreabilidade e a segurança no uso dos recursos. Também será possível gerar relatórios sobre a utilização de salas e laboratórios.
 
-----
+## Objetivo Geral
+Desenvolver um **sistema seguro** para o gerenciamento de chaves no IFPB-CG, utilizando um **quadro inteligente** com controle de acesso, rastreabilidade e integração com uma plataforma web.
+
+## Objetivos Específicos
+
+### 1. Garantir a rastreabilidade das chaves
+- Implementar um sistema de registros digital que permita identificar **quem retirou, devolveu ou transferiu uma chave** em tempo real.
+
+### 2. Aumentar a segurança no acesso às chaves
+- Integrar **controle de acesso por senha** para evitar retiradas não autorizadas.
+- Desenvolver um **mecanismo de trava eletrônica** para liberar o quadro apenas para as pessoas autorizadas.
+
+### 3. Automatizar o processo de retirada e devolução
+- Criar um fluxo eficiente de uso das chaves utilizando **QR codes**, reduzindo a necessidade de registros manuais.
+- Permitir a **transferência de chaves entre usuários** de forma segura e registrada.
+
+### 4. Facilitar a gestão e o monitoramento
+- Desenvolver uma plataforma web para **visualização em tempo real do status das chaves**.
+- Permitir a geração de **relatórios de uso** para auditoria e tomada de decisões.
+
+### 5. Melhorar a organização e eficiência operacional
+- Eliminar **registros físicos** e centralizar o controle das chaves em um único sistema.
+- Garantir a **disponibilidade do sistema** para que o acesso às chaves seja feito de maneira prática e eficiente.
+
 
 ## Benefícos
 ### Segurança
@@ -39,7 +62,7 @@ Além disso, o sistema permitirá a transferência de chaves entre recebedores, 
 - Registro completo de quem retirou, devolveu ou transferiu uma chave.
 - Facilidade para auditorias e monitoramento.
 
-----
+
 
 ## Funcionalidades
 - **Registro de Chaves e Usuários**: Cadastro de chaves com QR code e usuários autorizados.
@@ -71,7 +94,7 @@ Além disso, o sistema permitirá a transferência de chaves entre recebedores, 
 | RNF4 | Resposta rápida no login e abertura da trava | Crítico |
 | RNF5 | Suporte para navegadores e dispositivos móveis | Alto |
 
-----
+
 
 ## Materiais Utilizados
 - Quadro com ganchos para as chaves
@@ -86,7 +109,7 @@ Além disso, o sistema permitirá a transferência de chaves entre recebedores, 
 - Display
 - Servo motor
 
-----
+
 
 ## Tecnologias Utilizadas
 - **Hardware**: Raspberry Pi, Display, Servo Motor, Webcam
@@ -95,7 +118,7 @@ Além disso, o sistema permitirá a transferência de chaves entre recebedores, 
 - **Comunicação**: HTTP
 
 ----
-## Diagram de Blocos da Solução Proposta
+## Diagrama de Blocos da Solução Proposta
 ![Descrição da Imagem](Diagrama_Blocos.PNG)
 
 ## Fluxograma de Operação
