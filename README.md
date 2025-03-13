@@ -122,4 +122,4 @@ Desenvolver um **sistema seguro** para o gerenciamento de chaves no IFPB-CG, uti
 ![Descrição da Imagem](Diagrama_Blocos.PNG)
 
 ## Fluxograma de Operação
-![Descrição da Imagem](Fluxograma_Chaves.jpg)
+![Descrição da Imagem](Fluxograma_Chaves.png)
