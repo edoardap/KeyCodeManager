@@ -448,3 +448,32 @@ class AdapterDB:
         else:
             cursor.close()
             return False  # O usuário não possui nenhuma chave
+
+
+    def get_tempo_uso_chave(self):
+        query = """
+            WITH saidas AS (
+                SELECT 
+                    chave, 
+                    datahora AS saida
+                FROM historico
+                WHERE usuario_origem = 1
+            )
+            SELECT 
+                s.chave, 
+                SUM(
+                    TIMESTAMPDIFF(MINUTE, s.saida, 
+                        COALESCE(
+                            (SELECT MIN(h.datahora) 
+                             FROM historico h 
+                             WHERE h.chave = s.chave 
+                               AND h.usuario_destino = 1 
+                               AND h.datahora > s.saida), 
+                            NOW()
+                        )
+                    )
+                ) AS tempo_total_fora_minutos
+            FROM saidas s
+            GROUP BY s.chave;
+                """
+        return self.fetch_all(query)
