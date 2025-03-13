@@ -1,6 +1,7 @@
 import pymysql
 from datetime import datetime
 from flask import session
+from decimal import Decimal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -246,7 +247,6 @@ class AdapterDB:
             # Verifica quem está com a chave atualmente (usuario_origem)
             get_posse_query = "SELECT posse FROM chaves WHERE qrcode = %s"
             cursor.execute(get_posse_query, (chave.getQrCode(),))
-            usuario_origem = cursor.fetchone()[0]  # ID do usuário que está com a chave
 
             # Atualiza a posse da chave diretamente pelo QR Code
             update_query = "UPDATE chaves SET posse = %s WHERE qrcode = %s"
@@ -441,9 +441,10 @@ class AdapterDB:
             update_query = "UPDATE chaves SET posse = %s WHERE id = %s"
             cursor.execute(update_query, (1, chave['id']))  # 1 é o ID da gerência
             self.connection.commit()
-
+            print(chave)
             # Registra a devolução no histórico
-            self.add_historico(chave, id_user, 1)  # 1 é o ID da gerência
+
+            self.add_historico(chave['id'], id_user, 1)  # 1 é o ID da gerência
             self.connection.commit()
             cursor.close()
             return True  # Devolução bem-sucedida
@@ -455,27 +456,37 @@ class AdapterDB:
     def get_tempo_uso_chave(self):
         query = """
             WITH saidas AS (
-                SELECT 
-                    chave, 
-                    datahora AS saida
-                FROM historico
-                WHERE usuario_origem = 1
-            )
             SELECT 
-                s.chave, 
-                SUM(
-                    TIMESTAMPDIFF(MINUTE, s.saida, 
-                        COALESCE(
-                            (SELECT MIN(h.datahora) 
-                             FROM historico h 
-                             WHERE h.chave = s.chave 
-                               AND h.usuario_destino = 1 
-                               AND h.datahora > s.saida), 
-                            NOW()
-                        )
+                h.chave, 
+                c.nome AS nome_chave,
+                h.datahora AS saida
+            FROM historico h
+            JOIN chaves c ON h.chave = c.id
+            WHERE h.usuario_origem = 1
+        )
+        SELECT 
+            s.nome_chave,  -- Alterado para pegar o nome
+            SUM(
+                TIMESTAMPDIFF(MINUTE, s.saida, 
+                    COALESCE(
+                        (SELECT MIN(h.datahora) 
+                         FROM historico h 
+                         WHERE h.chave = s.chave 
+                           AND h.usuario_destino = 1 
+                           AND h.datahora > s.saida), 
+                        NOW()
                     )
-                ) AS tempo_total_fora_minutos
-            FROM saidas s
-            GROUP BY s.chave;
-                """
-        return self.fetch_all(query)
+                )
+            ) AS tempo_total_fora_minutos
+        FROM saidas s
+        GROUP BY s.nome_chave;  -- Agrupando pelo nome da chave
+    """
+
+        resultados = self.fetch_all(query)
+
+        # Converter Decimal para float
+        for row in resultados:
+            if isinstance(row["tempo_total_fora_minutos"], Decimal):
+                row["tempo_total_fora_minutos"] = float(row["tempo_total_fora_minutos"])
+
+        return resultados

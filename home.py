@@ -87,15 +87,17 @@ def login():
 
 @app.route("/tela-inicial", methods=["GET"])
 def telaInicialGerente():
-    ##servo.close_lock()
+    servo.close_lock()
     return render_template('tela-inicial.html')
 
 @app.route("/tela-inicial2", methods=["GET"])
 def telaInicialProfessor():
+    servo.close_lock()
     return render_template('tela-inicial2.html')
 
 @app.route("/tela-inicial3", methods=["GET"])
 def telaInicialAluno():
+    servo.close_lock()
     return render_template('tela-inicial3.html')
 
 @app.route("/acesso.html", methods = ["GET", "POST"])
@@ -237,6 +239,12 @@ def obter_dados():
 
     nomes_chaves = [row["nome"] for row in chaves_acessadas]  # Agora pega o nome real da chave
     quantidades = [row["quantidade"] for row in chaves_acessadas]  # Quantidade de acessos
+
+    # 4️⃣ Buscar o tempo de uso das chaves
+    tempo_uso_chaves = adapter.get_tempo_uso_chave()
+    chaves_tempo_uso = [row["nome_chave"] for row in tempo_uso_chaves]
+    tempo_total_fora = [row["tempo_total_fora_minutos"] for row in tempo_uso_chaves]
+
     # Fechar conexões
     cursor.close()
     adapter.connection.close()  # Fechar a conexão corretamente
@@ -246,7 +254,9 @@ def obter_dados():
         "chaves_guardadas": chaves_guardadas,
         "chaves_em_uso": chaves_em_uso,
         "usuarios": {"categorias": categorias, "valores": valores},
-        "chaves_acessadas": {"nome": nomes_chaves, "quantidades": quantidades}
+        "chaves_acessadas": {"nome": nomes_chaves, "quantidades": quantidades},
+        "tempo_uso_chaves": {"chave": chaves_tempo_uso, "tempo_fora": tempo_total_fora}
+
     })
 
 @app.route('/acessarGraficos', methods=['GET', 'POST'])
@@ -255,14 +265,15 @@ def acessarGraficos():
 
 @app.route("/devolverChave", methods=["POST"])
 def devolverChave():
+    servo.open_lock()
     adapter.connection.commit()
     id_user = session.get('user_id')
 
     # Tenta devolver a chave
     sucesso = adapter.devolverChave(id_user)
     if sucesso:
-        return jsonify({"success": True, "message": "chave devolvida com sucesso."})
+        return render_template('chave-devolvida-sucesso.html')
     else:
-        return jsonify({"success": False, "message": "Você não possui nenhuma chave para devolver."}), 400
+        return render_template('chave-devolvida-semsucesso.html')
 if __name__ == "__main__":
     app.run(debug=True)

@@ -78,7 +78,7 @@
             flex-direction: column;
             gap: 2rem;
             width: 100%;
-            max-width: 800px;
+            max-width: 1200px;
         }
 
         .row {
@@ -88,9 +88,9 @@
             width: 100%;
         }
 
-        .col-6 {
+        .col-4 {
             flex: 1;
-            max-width: 400px;
+            max-width: calc(33.333% - 1.5rem); /* 3 colunas com espaçamento */
         }
 
         /* Cards de Botões */
@@ -101,6 +101,10 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%; /* Garante que todos os cards tenham a mesma altura */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .card:hover {
@@ -129,6 +133,25 @@
             background-color: #4BC0C0;
         }
 
+        /* Botão de Devolução */
+        .btn-devolucao {
+            display: block;
+            background-color: #e74c3c; /* Cor vermelha para destacar */
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-devolucao:hover {
+            background-color: #c0392b; /* Tom mais escuro ao passar o mouse */
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
             .row {
@@ -136,7 +159,7 @@
                 gap: 1rem;
             }
 
-            .col-6 {
+            .col-4 {
                 max-width: 100%;
             }
 
@@ -170,16 +193,24 @@
     <div class="body2">
         <div class="buttons-container">
             <div class="row">
-                <div class="col-6">
+                <div class="col-4">
                     <div class="card">
                         <i class="bi bi-qr-code-scan icone-dashboard"></i>
                         <a href="{{ url_for('QRCode.lerQRCODE') }}" class="btn btn-dark-blue">Pegar Chaves</a>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                     <div class="card">
                         <i class="bi bi-key-fill icone-dashboard"></i>
                         <a href="{{ url_for('acessarChaves') }}" class="btn btn-dark-blue">Acessar Chaves</a>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card">
+                        <i class="bi bi-arrow-return-left icone-dashboard"></i>
+                        <form action="{{ url_for('devolverChave') }}" method="POST" style="width: 100%;">
+                            <button type="submit" class="btn-devolucao">Devolver Chave</button>
+                        </form>
                     </div>
                 </div>
             </div>
