@@ -438,6 +438,5 @@ class AdapterDB:
                 SUM(tempo_fora_minutos) AS tempo_total_minutos
             FROM tempo_calculado
             GROUP BY chave;
-
                 """
         return self.fetch_all(query)
