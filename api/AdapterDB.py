@@ -145,6 +145,7 @@ class AdapterDB:
             query += " AND h.usuario_destino = %s"
             params.append(usuario_destino)
 
+        query += " ORDER BY h.datahora DESC"
         return self.fetch_all(query, params)
 
     def get_alunos_chaves(self, somente_ativos = True, id = 0, chave = 0, aluno= 0, responsavel = 0):
@@ -247,7 +248,10 @@ class AdapterDB:
             # Verifica quem está com a chave atualmente (usuario_origem)
             get_posse_query = "SELECT posse FROM chaves WHERE qrcode = %s"
             cursor.execute(get_posse_query, (chave.getQrCode(),))
+            usuario_origem = cursor.fetchone()
 
+            usuario_origem = usuario_origem['posse']
+            print(usuario_origem)
             # Atualiza a posse da chave diretamente pelo QR Code
             update_query = "UPDATE chaves SET posse = %s WHERE qrcode = %s"
             cursor.execute(update_query, (id_user, chave.getQrCode()))
@@ -256,8 +260,7 @@ class AdapterDB:
             # Verifica se alguma linha foi modificada
             if cursor.rowcount >= 0:
                 chave = self.buscar_chave_por_qrcode((chave.getQrCode()))
-                if chave.getPosse() != id_user:
-                    self.add_historico(chave.getId(), chave.getPosse(), id_user)
+                self.add_historico(chave.getId(),usuario_origem, chave.getPosse())
                 self.connection.commit()
                 cursor.close()
                 return 2
