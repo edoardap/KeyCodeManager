@@ -423,25 +423,19 @@ class AdapterDB:
             )
             SELECT 
                 s.chave, 
-                s.saida,
-                COALESCE(
-                    (SELECT MIN(h.datahora) 
-                     FROM historico h 
-                     WHERE h.chave = s.chave 
-                       AND h.usuario_destino = 1 
-                       AND h.datahora > s.saida), 
-                    NOW()
-                ) AS retorno,  -- Se não houver retorno, usa NOW()
-                TIMESTAMPDIFF(MINUTE, s.saida, 
-                    COALESCE(
-                        (SELECT MIN(h.datahora) 
-                         FROM historico h 
-                         WHERE h.chave = s.chave 
-                           AND h.usuario_destino = 1 
-                           AND h.datahora > s.saida), 
-                        NOW()
+                SUM(
+                    TIMESTAMPDIFF(MINUTE, s.saida, 
+                        COALESCE(
+                            (SELECT MIN(h.datahora) 
+                             FROM historico h 
+                             WHERE h.chave = s.chave 
+                               AND h.usuario_destino = 1 
+                               AND h.datahora > s.saida), 
+                            NOW()
+                        )
                     )
-                ) AS tempo_fora_minutos
-            FROM saidas s;
+                ) AS tempo_total_fora_minutos
+            FROM saidas s
+            GROUP BY s.chave;
                 """
         return self.fetch_all(query)
