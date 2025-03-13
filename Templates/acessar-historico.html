@@ -131,8 +131,8 @@
     <!-- Header -->
     <div class="header">
        <a href="{{ url_for('telaInicialGerente') if session['user_type'] == 'gerente' else (url_for('telaInicialProfessor') if session['user_type'] == 'professor' else url_for('telaInicialAluno')) }}" class="voltar-btn">
-    <i class="bi bi-arrow-left-circle"></i>
-</a>
+            <i class="bi bi-arrow-left-circle"></i>
+        </a>
         <h1>Histórico de Acesso às Chaves</h1>
     </div>
 
@@ -141,17 +141,24 @@
         <table>
             <thead>
                 <tr>
+                    <th>Data</th>
                     <th>Hora</th>
                     <th>Chave</th>
-                    <th>Usuário</th>
+                    <th>Usuário Origem</th>
+                    <th>Usuário Destino</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody>
                 {% for historico in historicos %}
                 <tr>
-                    <td>{{ historico['datahora'] }}</td>
+                    <td>{{ historico['datahora'].strftime('%Y-%m-%d') }}</td> <!-- Formata a data -->
+                    <td>{{ historico['datahora'].strftime('%H:%M:%S') }}</td> <!-- Formata a hora -->
                     <td>{{ historico['nome_chave'] }}</td>
-                    <td>{{ historico['nome_usuario_destino'] }}</td>
+                    <td>{{ historico['nome_usuario_origem']}}</td>
+                    <td>{{ historico['nome_usuario_destino']}}</td>
+                    <td>{{ historico['acao']}}</td>
+
                 </tr>
                 {% endfor %}
             </tbody>

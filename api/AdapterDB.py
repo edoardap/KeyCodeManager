@@ -105,10 +105,19 @@ class AdapterDB:
 
     def get_historico(self, data_inicio, data_fim, hora_inicio, hora_fim, chave, usuario_origem, usuario_destino):
         query = """
-            SELECT h.*, c.nome AS nome_chave, u.nome AS nome_usuario_destino
+            SELECT h.*, 
+                   c.nome AS nome_chave, 
+                   u_origem.nome AS nome_usuario_origem, 
+                   u_destino.nome AS nome_usuario_destino,
+                   CASE
+                       WHEN h.usuario_origem = 1 THEN 'Retirada'
+                       WHEN h.usuario_destino = 1 THEN 'Devolução'
+                       ELSE 'Transferência'
+                   END AS acao
             FROM historico h
             LEFT JOIN chaves c ON h.chave = c.id
-            LEFT JOIN usuarios u ON h.usuario_destino = u.id
+            LEFT JOIN usuarios u_origem ON h.usuario_origem = u_origem.id
+            LEFT JOIN usuarios u_destino ON h.usuario_destino = u_destino.id
             WHERE 1=1
         """
         params = []
@@ -232,8 +241,13 @@ class AdapterDB:
         """
         cursor.execute(check_permission_query, (chave.getId(), id_user))
         permission = cursor.fetchone()
-        print(permission)
+
         if session['user_type'] == 'gerente' or session['user_type'] == 'professor' or permission!= None:
+            # Verifica quem está com a chave atualmente (usuario_origem)
+            get_posse_query = "SELECT posse FROM chaves WHERE qrcode = %s"
+            cursor.execute(get_posse_query, (chave.getQrCode(),))
+            usuario_origem = cursor.fetchone()[0]  # ID do usuário que está com a chave
+
             # Atualiza a posse da chave diretamente pelo QR Code
             update_query = "UPDATE chaves SET posse = %s WHERE qrcode = %s"
             cursor.execute(update_query, (id_user, chave.getQrCode()))
@@ -411,3 +425,26 @@ class AdapterDB:
         cursor.close()
         self.connection.commit()  # Confirma a  transação
         return alunos_autorizados
+
+    def devolverChave(self, id_user):
+        cursor = self.connection.cursor()
+
+        # Verifica se o usuário possui alguma chave
+        check_posse_query = "SELECT * FROM chaves WHERE posse = %s"
+        cursor.execute(check_posse_query, id_user)
+        chave = cursor.fetchone()  # Retorna a chave que o usuário possui
+
+        if chave is not None:
+            # Atualiza a posse da chave para a gerência (ID 1)
+            update_query = "UPDATE chaves SET posse = %s WHERE id = %s"
+            cursor.execute(update_query, (1, chave['id']))  # 1 é o ID da gerência
+            self.connection.commit()
+
+            # Registra a devolução no histórico
+            self.add_historico(chave, id_user, 1)  # 1 é o ID da gerência
+            self.connection.commit()
+            cursor.close()
+            return True  # Devolução bem-sucedida
+        else:
+            cursor.close()
+            return False  # O usuário não possui nenhuma chave

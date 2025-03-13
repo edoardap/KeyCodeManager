@@ -87,7 +87,7 @@ def login():
 
 @app.route("/tela-inicial", methods=["GET"])
 def telaInicialGerente():
-    servo.close_lock()
+    ##servo.close_lock()
     return render_template('tela-inicial.html')
 
 @app.route("/tela-inicial2", methods=["GET"])
@@ -150,7 +150,6 @@ def adicionarUsuario():
 @app.route("/alunosAutorizados", methods=["GET", "POST"])
 def alunosAutorizados():
     professor_id = session.get('user_id')  # Obtém o ID do professor logado
-    print(professor_id)
     alunos_autorizados = adapter.obter_alunos_autorizados(professor_id)
     return render_template('Alunos-autorizados.html', alunos_autorizados=alunos_autorizados)
 
@@ -178,7 +177,6 @@ def acessarHistorico():
         usuario_destino=usuario_destino
     )
 
-    # Renderiza o template com os históricos encontrados
     return render_template('acessar-historico.html', historicos=historicos)
 
 
@@ -196,6 +194,14 @@ def obter_dados():
     resultado = cursor.fetchone()
 
     total_chaves = resultado.get('COUNT(*)', 0)  # Retorna 0 se a chave não existir
+
+    # 2️⃣ Contar chaves guardadas (em posse da gerência)
+    cursor.execute("SELECT COUNT(*) FROM chaves WHERE posse = 1")
+    chaves_guardadas = cursor.fetchone().get('COUNT(*)', 0)
+
+    # 3️⃣ Contar chaves em uso
+    cursor.execute("SELECT COUNT(*) FROM chaves WHERE posse != 1")
+    chaves_em_uso = cursor.fetchone().get('COUNT(*)', 0)
 
     # 2️⃣ Contar usuários por categoria
     cursor.execute("SELECT nivel, COUNT(*) FROM usuarios GROUP BY nivel")
@@ -228,7 +234,6 @@ def obter_dados():
     """
     cursor.execute(query_chaves_acessadas, params)
     chaves_acessadas = cursor.fetchall()
-    print(chaves_acessadas)
 
     nomes_chaves = [row["nome"] for row in chaves_acessadas]  # Agora pega o nome real da chave
     quantidades = [row["quantidade"] for row in chaves_acessadas]  # Quantidade de acessos
@@ -238,6 +243,8 @@ def obter_dados():
 
     return jsonify({
         "total_chaves": total_chaves,
+        "chaves_guardadas": chaves_guardadas,
+        "chaves_em_uso": chaves_em_uso,
         "usuarios": {"categorias": categorias, "valores": valores},
         "chaves_acessadas": {"nome": nomes_chaves, "quantidades": quantidades}
     })
@@ -246,5 +253,16 @@ def obter_dados():
 def acessarGraficos():
     return render_template('graficos.html')
 
+@app.route("/devolverChave", methods=["POST"])
+def devolverChave():
+    adapter.connection.commit()
+    id_user = session.get('user_id')
+
+    # Tenta devolver a chave
+    sucesso = adapter.devolverChave(id_user)
+    if sucesso:
+        return jsonify({"success": True, "message": "chave devolvida com sucesso."})
+    else:
+        return jsonify({"success": False, "message": "Você não possui nenhuma chave para devolver."}), 400
 if __name__ == "__main__":
     app.run(debug=True)

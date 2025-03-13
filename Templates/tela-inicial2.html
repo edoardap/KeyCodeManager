@@ -129,6 +129,25 @@
             background-color: #4BC0C0;
         }
 
+        /* Botão de Devolução */
+        .btn-devolucao {
+            display: block;
+            background-color: #e74c3c; /* Cor vermelha para destacar */
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-devolucao:hover {
+            background-color: #c0392b; /* Tom mais escuro ao passar o mouse */
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
             .row {
@@ -186,6 +205,17 @@
                     <div class="card">
                         <i class="bi bi-people-fill icone-dashboard"></i>
                         <a href="{{ url_for('alunosAutorizados') }}" class="btn btn-dark-blue">Alunos Autorizados</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Botão de Devolução -->
+            <div class="row">
+                <div class="col-4">
+                    <div class="card">
+                        <i class="bi bi-arrow-return-left icone-dashboard"></i>
+                        <form action="{{ url_for('devolverChave') }}" method="POST" style="width: 100%;">
+                            <button type="submit" class="btn-devolucao">Devolver Chave</button>
+                        </form>
                     </div>
                 </div>
             </div>
