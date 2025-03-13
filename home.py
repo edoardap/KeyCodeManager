@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 
 import keyboard
-from classesV2 import *
 from Models.tela_login import TelaLogin
 from Models.Chave import Chave
 from Models.Chave import chave_bp
