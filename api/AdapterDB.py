@@ -414,29 +414,34 @@ class AdapterDB:
 
     def get_tempo_uso_chave(self):
         query = """
-            WITH movimentacoes AS (
+            WITH saidas AS (
                 SELECT 
                     chave, 
-                    datahora AS saida,
-                    LEAD(datahora) OVER (
-                        PARTITION BY chave ORDER BY datahora
-                    ) AS retorno
+                    datahora AS saida
                 FROM historico
-                WHERE usuario_origem = 1  -- Somente saídas do gerente
-            ),
-            tempo_calculado AS (
-                SELECT 
-                    chave, 
-                    TIMESTAMPDIFF(MINUTE, saida, COALESCE(retorno, NOW())) AS tempo_fora_minutos
-                FROM movimentacoes
-                WHERE retorno IS NULL OR retorno IN (
-                    SELECT datahora FROM historico WHERE usuario_destino = 1
-                )  -- Garantir que o retorno é para o gerente
+                WHERE usuario_origem = 1
             )
             SELECT 
-                chave, 
-                SUM(tempo_fora_minutos) AS tempo_total_minutos
-            FROM tempo_calculado
-            GROUP BY chave;
+                s.chave, 
+                s.saida,
+                COALESCE(
+                    (SELECT MIN(h.datahora) 
+                     FROM historico h 
+                     WHERE h.chave = s.chave 
+                       AND h.usuario_destino = 1 
+                       AND h.datahora > s.saida), 
+                    NOW()
+                ) AS retorno,  -- Se não houver retorno, usa NOW()
+                TIMESTAMPDIFF(MINUTE, s.saida, 
+                    COALESCE(
+                        (SELECT MIN(h.datahora) 
+                         FROM historico h 
+                         WHERE h.chave = s.chave 
+                           AND h.usuario_destino = 1 
+                           AND h.datahora > s.saida), 
+                        NOW()
+                    )
+                ) AS tempo_fora_minutos
+            FROM saidas s;
                 """
         return self.fetch_all(query)
