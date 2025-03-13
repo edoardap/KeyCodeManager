@@ -402,10 +402,10 @@ class AdapterDB:
 
         # Consulta SQL para obter os alunos autorizados
         query = """
-        SELECT 
+         SELECT 
             a.id AS aluno_id,
             a.nome AS aluno_nome,
-            ac.chave AS chave,
+            c.nome AS chave_nome,  -- Nome da chave ao invés do ID
             u.nome AS responsavel_nome,
             u.email AS responsavel_email
         FROM 
@@ -414,6 +414,8 @@ class AdapterDB:
             usuarios a ON ac.aluno = a.id
         JOIN 
             usuarios u ON ac.responsavel = u.id
+        JOIN 
+            chaves c ON ac.chave = c.id  -- JOIN com a tabela chaves
         WHERE 
             ac.responsavel = %s;
         """
