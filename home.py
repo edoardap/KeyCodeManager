@@ -86,17 +86,17 @@ def login():
 
 @app.route("/tela-inicial", methods=["GET"])
 def telaInicialGerente():
-    ##servo.close_lock()
+    servo.close_lock()
     return render_template('tela-inicial.html')
 
 @app.route("/tela-inicial2", methods=["GET"])
 def telaInicialProfessor():
-    ##servo.close_lock()
+    servo.close_lock()
     return render_template('tela-inicial2.html')
 
 @app.route("/tela-inicial3", methods=["GET"])
 def telaInicialAluno():
-    ##servo.close_lock()
+    servo.close_lock()
     return render_template('tela-inicial3.html')
 
 @app.route("/acesso.html", methods = ["GET", "POST"])
@@ -264,7 +264,7 @@ def acessarGraficos():
 
 @app.route("/devolverChave", methods=["POST"])
 def devolverChave():
-    ##servo.open_lock()
+    servo.open_lock()
     adapter.connection.commit()
     id_user = session.get('user_id')
 

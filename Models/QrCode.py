@@ -55,7 +55,7 @@ def gerar_qrcode(cod, name):
 
 @QRCode_bp.route("/home.html", methods = ["GET", "POST"])
 def lerQRCODE(mirror=False):
-    ##servo.open_lock()
+    servo.open_lock()
     cam = cv2.VideoCapture(0)
     cam.set(3, 640)
     cam.set(4, 480)
